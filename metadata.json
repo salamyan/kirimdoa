@@ -1,0 +1,6 @@
+{
+  "name": "Kirim Doa — Yayasan An Nabawi",
+  "description": "Kirim nama dan hajat anda untuk didoakan oleh para huffaz dan pelajar tahfiz di 4 cawangan Yayasan An Nabawi (Machang, Shah Alam, Jerantut, Langkawi).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

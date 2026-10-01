@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kirim Doa — Yayasan An Nabawi</title>
+  <meta name="description" content="Kirim nama dan hajat anda untuk didoakan oleh para pelajar tahfiz di empat cawangan Yayasan An Nabawi. Percuma, sumbangan hanya pilihan.">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yayasanannabawi.com/kirim-doa">
+  <meta property="og:title" content="Kirim Doa — Yayasan An Nabawi">
+  <meta property="og:description" content="Kirim nama & hajat anda. Para huffaz kami doakan di 4 cawangan tahfiz YAN. Percuma, sumbangan hanya pilihan.">
+  <meta property="og:image" content="/images/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kirim Doa — Yayasan An Nabawi">
+  <meta name="twitter:description" content="Kirim nama & hajat anda. Para huffaz kami doakan di 4 cawangan tahfiz YAN. Percuma, sumbangan hanya pilihan.">
+  <meta name="twitter:image" content="/images/og-image.jpg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- JSON-LD Structured Data for Charity Campaign -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NGO",
+    "name": "Yayasan An Nabawi",
+    "url": "https://yayasanannabawi.com",
+    "logo": "https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png",
+    "description": "Kempen Kirim Doa bersama pelajar tahfiz Yayasan An Nabawi di Machang, Shah Alam, Jerantut dan Langkawi.",
+    "telephone": "014-9200024",
+    "email": "salam@yayasanannabawi.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "No 23-3, Jalan Pegaga B U12/B, Desa Alam, Seksyen U12",
+      "addressLocality": "Shah Alam",
+      "addressRegion": "Selangor",
+      "postalCode": "40170",
+      "addressCountry": "MY"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<main>
+  <!-- HERO + STICKY FORM -->
+  <section class="hero wrap">
+    <div class="hero__copy">
+      <span class="pill"><span class="dot"></span>Percuma · Terbuka untuk semua</span>
+      <h1 class="display">Kirim nama &amp; hajat anda. Para huffaz kami <em>doakan.</em></h1>
+      <p class="lead">Nama dan hajat anda dibacakan oleh pelajar tahfiz di empat cawangan Yayasan An Nabawi. Tawaran percuma ini istimewa buat anda para penyokong kami</p>
+
+      <!-- Gambar Pelajar Tahfiz Yayasan An Nabawi -->
+      <div class="hero-floating-visual">
+        <div class="floating-img-wrap">
+          <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ASZ07003.jpg" alt="Pelajar tahfiz Yayasan An Nabawi" class="floating-student-img" loading="eager">
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM CONTAINER -->
+    <div id="borang" class="hero__form">
+      <form id="doaForm" class="card form" novalidate>
+        <div class="form__head">
+          <h2 class="h2">Kirim doa anda</h2>
+          <p class="muted small">Ruangan bertanda * wajib diisi.</p>
+        </div>
+
+        <!-- Anti-spam Honeypot field (hidden from real users) -->
+        <div class="hp-trap" aria-hidden="true">
+          <label for="web_site_trap">Sila biarkan kosong</label>
+          <input type="text" id="web_site_trap" name="web_site_trap" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="pengirim">Nama anda *</label>
+            <input id="pengirim" name="pengirim" type="text" autocomplete="name" placeholder="Nama penuh anda" required maxlength="80">
+          </div>
+          <div class="field">
+            <label for="telefon">WhatsApp <span class="opt">(pilihan)</span></label>
+            <input id="telefon" name="telefon" type="tel" inputmode="tel" autocomplete="tel" placeholder="012 345 6789" maxlength="20">
+          </div>
+        </div>
+        <p class="hint">Nombor WhatsApp hanya untuk makluman apabila hajat anda telah selesai dibacakan.</p>
+
+        <fieldset class="field">
+          <legend>Nama yang ingin didoakan *</legend>
+          <div id="namesList" class="names"></div>
+          <button type="button" id="addName" class="btn btn--dashed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Tambah nama (maks. 3)
+          </button>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Jenis hajat *</legend>
+          <div class="chips" data-group="jenisHajat" role="radiogroup" aria-label="Pilih jenis hajat">
+            <button type="button" class="chip" data-value="Kesihatan" aria-pressed="true">Kesihatan</button>
+            <button type="button" class="chip" data-value="Rezeki" aria-pressed="false">Rezeki</button>
+            <button type="button" class="chip" data-value="Jodoh" aria-pressed="false">Jodoh</button>
+            <button type="button" class="chip" data-value="Zuriat" aria-pressed="false">Zuriat</button>
+            <button type="button" class="chip" data-value="Kejayaan" aria-pressed="false">Kejayaan</button>
+            <button type="button" class="chip" data-value="Untuk arwah" aria-pressed="false">Untuk arwah</button>
+            <button type="button" class="chip" data-value="Lain-lain" aria-pressed="false">Lain-lain</button>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="hajat">Hajat anda <span class="opt">(pilihan)</span></label>
+          <textarea id="hajat" name="hajat" rows="3" maxlength="300" placeholder="cth. Semoga ibu dikurniakan kesembuhan sepenuhnya dan dipermudahkan urusan rawatan."></textarea>
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" id="consent" required>
+          <span>Saya faham nama dan hajat ini hanya dikongsi dengan pelajar tahfiz yang membacanya, dan tidak dipaparkan kepada umum di internet.</span>
+        </label>
+
+        <p id="formError" class="error" role="alert" hidden></p>
+
+        <button type="submit" id="submitBtn" class="btn btn--accent btn--lg btn--block">
+          Hantar Hajat Percuma
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <!-- SUCCESS & POST-SUBMISSION VIEW -->
+      <div id="success" class="card success post-submit" hidden tabindex="-1">
+        <!-- 1. Confirmation Banner -->
+        <div class="post-submit__head">
+          <div class="post-submit__head-top">
+            <div class="success__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="post-submit__badge">
+              <span class="dot" style="background:#12B76A;"></span>
+              100% Percuma · Telah Diterima
+            </div>
+          </div>
+          <div class="post-submit__head-body">
+            <h2 class="h2 post-submit__title">Alhamdulillah, hajat anda selamat diterima!</h2>
+            <p class="muted post-submit__desc">
+              Nama dan hajat anda telah disusun ke dalam senarai bacaan doa para huffaz di 4 cawangan Yayasan An Nabawi.
+            </p>
+          </div>
+        </div>
+
+        <!-- Submission Summary Snapshot -->
+        <div class="post-submit__summary">
+          <div class="summary-item">
+            <span class="summary-label">Pengirim</span>
+            <strong id="summaryPengirim" class="summary-val">-</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Jenis Hajat</span>
+            <span id="summaryHajat" class="badge badge--live">-</span>
+          </div>
+          <div class="summary-item summary-item--full">
+            <span class="summary-label">Nama Didoakan</span>
+            <div id="summaryNama" class="summary-val">-</div>
+          </div>
+          <div class="summary-item summary-item--full">
+            <span class="summary-label">Status Kiriman</span>
+            <div style="display:flex; align-items:center;">
+              <span class="badge" style="background:#ECFDF3; color:#027A48; font-weight:600; display:inline-flex; align-items:center; gap:4px;">✓ Percuma (Direkod)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. WAKTU MUSTAJAB BACAAN DOA -->
+        <div class="post-submit__waktu">
+          <div class="waktu-header">
+            <span class="waktu-badge"><span class="dot"></span>Waktu Mustajab</span>
+            <span class="waktu-time-tag">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Isnin &amp; Khamis · 6:45 Petang
+            </span>
+          </div>
+          <h3 class="waktu-title">Dibacakan Sejurus Sebelum Berbuka Puasa Sunat</h3>
+          <p class="waktu-desc">
+            Para pelajar tahfiz di 4 cawangan YAN akan berhimpun menadah tangan mengaminkan doa anda secara serentak sebelum azan Maghrib.
+          </p>
+          <div class="hadith-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent); flex-shrink:0;" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 8v4l3 3"/></svg>
+            <p>
+              <em>"Doa orang yang berpuasa tidak ditolak sehingga dia berbuka."</em>
+              <span class="hadith-source">(HR At-Tirmidzi)</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. SUMBANGAN PILIHAN (SUKARELA: QR & FPX) -->
+        <div class="post-submit__donation">
+          <div class="donation-header">
+            <span class="eyebrow" style="color:var(--accent);">Pilihan Sukarela</span>
+            <h3 class="h3" style="margin:2px 0 0;">Tajaan Juadah Iftar &amp; Kebajikan Asnaf</h3>
+            <p class="small muted" style="margin:4px 0 0; line-height:1.5;">
+              Kiriman doa anda adalah <strong>100% percuma</strong>. Bagi yang berhasrat menyumbang seikhlas hati untuk tajaan makanan dan kebajikan pelajar tahfiz:
+            </p>
+          </div>
+
+          <!-- Tabs: QR & FPX Sahaja -->
+          <div class="donate-tabs" role="tablist" aria-label="Kaedah sumbangan">
+            <button type="button" id="tabQrBtn" class="donate-tab is-active" role="tab" aria-selected="true" aria-controls="paneQr">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M10 7v3h3v-3M10 14v3h3v-3M7 10h10M10 10v4"/></svg>
+              QR
+            </button>
+            <button type="button" id="tabBillplzBtn" class="donate-tab" role="tab" aria-selected="false" aria-controls="paneBillplz">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              FPX
+            </button>
+          </div>
+
+          <!-- OPTION 1: QR -->
+          <div id="paneQr" class="donate-pane" role="tabpanel">
+            <div class="qr-minimal-view">
+              <!-- QR Code Frame Minimal -->
+              <div class="qr-square-frame">
+                <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/qronly.png" alt="Kod QR DuitNow Yayasan An Nabawi" class="qr-image" width="160" height="160" loading="eager">
+              </div>
+
+              <p class="qr-scan-hint">Imbas guna mana-mana Bank atau e-Wallet (TNG, MAE, dll.)</p>
+
+              <!-- Bank Account Clean Box -->
+              <div class="bank-clean-card">
+                <div class="bank-clean-row">
+                  <div class="bank-brand-col">
+                    <span class="bank-name">Maybank</span>
+                    <strong class="bank-acc-no" id="bankAccNo">5621 0686 0036</strong>
+                  </div>
+                  <button type="button" id="copyAccBtn" class="btn btn--sm btn--soft" style="padding:0 12px; min-height:34px; font-size:12.5px;">
+                    Salin
+                  </button>
+                </div>
+                <div class="bank-holder-text">Yayasan An Nabawi</div>
+              </div>
+
+              <!-- Button Ringkas -->
+              <button type="button" id="confirmQrPaidBtn" class="btn btn--accent btn--block">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                Sahkan Pembayaran
+              </button>
+            </div>
+          </div>
+
+          <!-- OPTION 2: FPX -->
+          <div id="paneBillplz" class="donate-pane" role="tabpanel" hidden>
+            <div class="fpx-minimal-view">
+              <div class="fpx-amounts-head">
+                <span class="small" style="font-weight:600; color:var(--ink);">Pilih Amaun Sumbangan:</span>
+                <span class="badge" style="background:#EEF2FF; color:var(--accent); font-size:11px; font-weight:700;">FPX Online</span>
+              </div>
+
+              <!-- Amount selection chips -->
+              <div class="amounts post-amounts" id="postBillplzAmounts" role="radiogroup" aria-label="Pilih jumlah sumbangan FPX">
+                <button type="button" class="chip chip--amt" data-post-amt="10" aria-pressed="false">RM10</button>
+                <button type="button" class="chip chip--amt" data-post-amt="30" aria-pressed="true">RM30</button>
+                <button type="button" class="chip chip--amt" data-post-amt="50" aria-pressed="false">RM50</button>
+                <button type="button" class="chip chip--amt" data-post-amt="100" aria-pressed="false">RM100</button>
+                <button type="button" class="chip chip--amt" data-post-amt="lain" aria-pressed="false">Lain</button>
+              </div>
+
+              <div id="postCustomAmtWrap" class="field" hidden style="margin-top:6px;">
+                <label for="postCustomAmt" style="font-size:13px;">Amaun Pilihan Sendiri (RM)</label>
+                <input id="postCustomAmt" type="number" inputmode="decimal" min="1" step="1" placeholder="cth. 25">
+              </div>
+
+              <div class="fpx-action-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                  <span style="font-size:13.5px; font-weight:600; color:var(--ink);">Jumlah:</span>
+                  <strong id="postBillplzAmtLabel" style="font-size:17px; color:var(--accent);">RM30</strong>
+                </div>
+
+                <a id="postBillplzBtn" href="#" class="btn btn--accent btn--lg btn--block" target="_blank" rel="noopener">
+                  Sumbang <span id="btnBillplzAmtText">RM30</span> (FPX)
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+
+                <button type="button" id="paySimBtn" class="btn btn--ghost btn--sm btn--block">
+                  Simulasi Pembayaran (Ujian)
+                </button>
+
+                <p class="hint center" style="margin-top:2px; font-size:12px;">
+                  Disokong melalui FPX (Maybank2u, CIMB Clicks, Bank Islam, dll.)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paid Receipt Notice (shown once paid/simulated/QR confirmed) -->
+          <div id="paidReceiptNotice" class="stat-card" style="background:#ECFDF3; border-color:#A6F4C5; margin-top:10px;" hidden>
+            <div style="display:flex; align-items:center; gap:8px; color:#027A48; font-weight:600;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+              Sumbangan Telah Disahkan!
+            </div>
+            <p class="small" id="receiptText" style="color:#05603A; margin-top:4px;">
+              Jazakumullahu khair. Sumbangan anda telah direkodkan bersama senarai bacaan doa.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4. FOOTER ACTIONS -->
+        <div class="success__actions" style="margin-top:16px;">
+          <button type="button" id="shareBtn" class="btn btn--ghost">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Kongsi kempen ke WhatsApp
+          </button>
+          <button type="button" id="againBtn" class="btn btn--soft">
+            Kirim hajat lain
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRANCHES SECTION -->
+  <section id="cawangan" class="dark">
+    <div class="wrap section">
+      <div class="section__head">
+        <div>
+          <div class="eyebrow eyebrow--dark">Dibacakan di</div>
+          <h2 class="h1">Empat cawangan, satu doa.</h2>
+        </div>
+        <p class="muted-dark">Doa anda diaminkan serentak oleh para huffaz di kesemua empat cawangan YAN.</p>
+      </div>
+      <div class="branches">
+        <div class="branch">
+          <span class="branch__no">01</span>
+          <h3>Machang</h3>
+          <p>Maahad Tahfiz Integrasi Al-Azhari, Bukit Bakar, Kelantan</p>
+        </div>
+        <div class="branch">
+          <span class="branch__no">02</span>
+          <h3>Shah Alam</h3>
+          <p>Maahad Tahfiz An Nabawi, Seksyen 7, Selangor</p>
+        </div>
+        <div class="branch">
+          <span class="branch__no">03</span>
+          <h3>Jerantut</h3>
+          <p>Maahad Tahfiz An Nabawi Cawangan Jerantut, Pahang</p>
+        </div>
+        <div class="branch">
+          <span class="branch__no">04</span>
+          <h3>Langkawi</h3>
+          <p>Pusat Tahfiz &amp; Tarbiah Al-Quran Langkawi, Kedah</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KOLEKSI GAMBAR / SUASANA (LENSA HUFFAZ YAN) -->
+  <section id="galeri" class="wrap section">
+    <div class="section__head">
+      <div>
+        <div class="eyebrow">Lensa Huffaz YAN</div>
+        <h2 class="h1">Suasana bacaan doa &amp; kehidupan pelajar</h2>
+        <p class="lead">Koleksi rakaman lensa suasana anak-anak tahfiz kami mengaji, mengulang hafazan al-Quran dan berhimpun menadah tangan mendoakan hajat para penyokong.</p>
+      </div>
+      <a href="#" data-config-href="social" class="link-arrow">
+        Koleksi penuh di media sosial YAN
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+    </div>
+    <div class="gallery">
+      <figure class="gallery-item">
+        <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ASZ07159.jpg" alt="Suasana pelajar tahfiz Yayasan An Nabawi" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ASZ07006.jpg" alt="Suasana pelajar tahfiz Yayasan An Nabawi" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ASZ07452.jpg" alt="Suasana pelajar tahfiz Yayasan An Nabawi" loading="lazy">
+      </figure>
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section id="faq" class="wrap section faq">
+    <h2 class="h1">Soalan lazim</h2>
+    <div class="faq__list">
+      <details>
+        <summary>Adakah perkhidmatan Kirim Doa ini benar-benar percuma?</summary>
+        <p>Ya, seratus peratus percuma. Anda boleh menghantar nama dan apa jua hajat yang baik tanpa sebarang syarat pembayaran. Sumbangan hanyalah pilihan sukarela bagi yang berkemampuan untuk menyokong makan minum harian serta pengajian anak-anak tahfiz asnaf.</p>
+      </details>
+      <details>
+        <summary>Bilakah doa dan hajat ini dibacakan?</summary>
+        <p>Senarai nama disusun dan dibacakan pada <strong data-config="jadual"></strong> iaitu sejurus sebelum waktu berbuka puasa di keempat-empat cawangan YAN.</p>
+      </details>
+      <details>
+        <summary>Bagaimana saya mengetahui doa saya telah dibacakan?</summary>
+        <p>Sekiranya anda menyertakan nombor WhatsApp, petugas kami akan menghantar makluman ringkas dan pautan rakaman lensa sesi bacaan doa tersebut setelah sesi selesai.</p>
+      </details>
+      <details>
+        <summary>Bolehkah saya menghantar nama untuk ahli keluarga yang telah meninggal dunia (arwah)?</summary>
+        <p>Boleh. Pilih jenis hajat "Untuk arwah", dan para pelajar tahfiz kami akan menitipkan bacaan doa khusus serta tahlil ringkas untuk dihadiahkan kepada arwah yang dinamakan.</p>
+      </details>
+      <details>
+        <summary>Ke mana wang sumbangan disalurkan jika saya memilih untuk menyumbang?</summary>
+        <p>Sumbangan disalurkan secara terus ke Tabung Kebajikan &amp; Pendidikan Yayasan An Nabawi untuk menampung kos makan minum berkhasiat harian, yuran pelajar asnaf, kitab pengajian dan operasi asrama keempat-empat madrasah tahfiz kami.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__col">
+      <a href="/" class="footer__brand" aria-label="Yayasan An Nabawi">
+        <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png" alt="Yayasan An Nabawi" class="footer__logo" loading="lazy">
+      </a>
+      <div class="footer__info">
+        <strong style="color:var(--ground); font-weight:600;">Yayasan An Nabawi</strong><br>
+        No 23-3, Jalan Pegaga B U12/B,<br>
+        Desa Alam, Seksyen U12,<br>
+        40170 Shah Alam, Selangor<br>
+        <span style="display:inline-block; margin-top:6px;">
+          Telefon: <a href="https://wa.me/60149200024" target="_blank" rel="noopener noreferrer" style="color:var(--ground); font-weight:500;" data-config="telefon">014-9200024</a> · E-mel: <a href="mailto:salam@yayasanannabawi.com" style="color:var(--ground);">salam@yayasanannabawi.com</a>
+        </span>
+      </div>
+    </div>
+    <div class="footer__col footer__col--end">
+      <div class="social">
+        <a href="https://www.facebook.com/tahfizannabawi/" target="_blank" rel="noopener noreferrer" data-config-href="facebook">Facebook</a>
+        <a href="https://www.tiktok.com/@yayasanannabawi" target="_blank" rel="noopener noreferrer" data-config-href="tiktok">TikTok</a>
+      </div>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <a href="/admin.html" class="footer__admin-link" title="Buka Portal Petugas Pentadbir">
+          Portal Petugas (Admin)
+        </a>
+        <small>© <span id="year"></span> Yayasan An Nabawi. Hak cipta terpelihara.</small>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- PAYMENT SIMULATION / VERIFY MODAL -->
+<div id="paySimModal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="paySimTitle">
+  <div class="modal" style="max-width: 480px;">
+    <div class="modal__header">
+      <h3 id="paySimTitle" class="h3">Simulasi FPX Online</h3>
+      <button type="button" class="modal__close" id="closePaySimBtn">&times;</button>
+    </div>
+    <div class="modal__body">
+      <p class="small muted">Ini adalah portal ujian pembayaran pantas untuk menguji kemas kini status sumbangan secara terus ke pangkalan data.</p>
+      
+      <div class="pay-sim-card">
+        <div class="pay-sim-row"><span>Rujukan Bil:</span><strong id="simRefId">-</strong></div>
+        <div class="pay-sim-row"><span>Nama Pengirim:</span><span id="simSenderName">-</span></div>
+        <div class="pay-sim-row"><span>Jumlah Sumbangan:</span><strong id="simAmountLabel" style="color:var(--accent);">RM0</strong></div>
+        <div class="pay-sim-row"><span>Bank Pilihan:</span><span>Maybank2u / CIMB Clicks / Bank Islam</span></div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button type="button" id="confirmSimPayBtn" class="btn btn--accent btn--block">
+          Sahkan Bayaran Berjaya (Simulasi Webhook)
+        </button>
+        <button type="button" id="cancelSimPayBtn" class="btn btn--ghost btn--block">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- YOUTUBE AUDIO-ONLY PLAYER (HIDDEN CONTAINER) -->
+<div id="ytAudioContainer" class="yt-audio-container" aria-hidden="true">
+  <div id="ytAudioPlayer"></div>
+</div>
+
+<!-- FLOATING ISLAMIC AUDIO BAR (USTAZ AHMAD DUSUKI - 70% VOLUME) -->
+<aside id="audioPlayerWidget" class="audio-widget" aria-label="Alunan Audio Doa Ibu Bapa">
+  <div class="audio-widget__bar" id="audioWidgetBar">
+    <!-- Play/Pause Button -->
+    <button type="button" id="audioPlayToggleBtn" class="audio-widget__play-btn" aria-label="Main atau henti audio">
+      <span id="audioPlayIcon" class="audio-icon-play">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6 3 20 12 6 21 6 3"></polygon>
+        </svg>
+      </span>
+      <span id="audioPauseIcon" class="audio-icon-pause" style="display: none;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="6" y="4" width="4" height="16"></rect>
+          <rect x="14" y="4" width="4" height="16"></rect>
+        </svg>
+      </span>
+    </button>
+
+    <!-- Info & Equalizer -->
+    <div class="audio-widget__content">
+      <div class="audio-widget__header">
+        <strong class="audio-widget__title">Doa Buat Ibu Bapa</strong>
+        <!-- Animated Soundwave equalizer -->
+        <span class="audio-equalizer" id="audioEqualizer" aria-hidden="true">
+          <span class="eq-bar"></span>
+          <span class="eq-bar"></span>
+          <span class="eq-bar"></span>
+        </span>
+      </div>
+      <div class="audio-widget__meta">
+        <span class="audio-widget__reciter">Ustaz Ahmad Dusuki</span>
+        <span class="audio-widget__dot">·</span>
+        <span id="audioStatusLabel" class="audio-widget__status">Dimainkan</span>
+      </div>
+    </div>
+
+    <!-- Volume & Controls -->
+    <div class="audio-widget__controls">
+      <button type="button" id="audioMuteBtn" class="audio-widget__mute-btn" title="Bisu / Nyahbisu" aria-label="Bisu atau Nyahbisu">
+        <svg id="audioVolHighSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <svg id="audioVolMuteSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
+      <input type="range" id="audioVolumeSlider" class="audio-widget__slider" min="0" max="100" value="70" aria-label="Kelarasan Bunyi" />
+      <span id="audioVolumeValue" class="audio-widget__vol-num">70%</span>
+    </div>
+
+    <!-- Minimize Button -->
+    <button type="button" id="audioMinimizeBtn" class="audio-widget__minimize-btn" title="Kecilkan bar audio" aria-label="Kecilkan bar audio">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Collapsed Mini Floating Disc / Pill -->
+  <button type="button" id="audioMiniBadge" class="audio-mini-badge" style="display: none;" title="Buka pemain audio doa" aria-label="Buka pemain audio doa">
+    <span class="audio-mini-badge__disc">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+      </svg>
+    </span>
+    <span class="audio-mini-badge__text">Doa Ibu Bapa · 70%</span>
+  </button>
+</aside>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

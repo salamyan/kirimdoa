@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "kirimDoa": {
+      "title": "KirimDoa",
+      "description": "Rekod kiriman doa dan hajat untuk dibacakan oleh pelajar tahfiz Yayasan An Nabawi",
+      "type": "object",
+      "properties": {
+        "pengirim": {
+          "type": "string",
+          "description": "Nama pengirim doa",
+          "maxLength": 80,
+          "minLength": 1
+        },
+        "telefon": {
+          "type": "string",
+          "description": "Nombor WhatsApp pengirim untuk makluman selesai doa (pilihan)",
+          "maxLength": 30
+        },
+        "nama": {
+          "type": "array",
+          "description": "Senarai nama individu yang ingin didoakan (1 hingga 3 nama)",
+          "items": {
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "jenisHajat": {
+          "type": "string",
+          "description": "Kategori hajat doa"
+        },
+        "hajat": {
+          "type": "string",
+          "description": "Butiran doa atau hajat khusus",
+          "maxLength": 1000
+        },
+        "cawangan": {
+          "type": "string",
+          "description": "Cawangan tahfiz pilihan pengirim",
+          "enum": ["Semua cawangan", "Machang", "Shah Alam", "Jerantut", "Langkawi"]
+        },
+        "sumbangan": {
+          "type": "number",
+          "description": "Jumlah sumbangan infaq dalam RM (0 jika percuma)"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status sumbangan",
+          "enum": ["baru", "menunggu", "dibayar"]
+        },
+        "dibaca": {
+          "type": "boolean",
+          "description": "Status sama ada telah dibaca oleh para huffaz"
+        },
+        "kaedah": {
+          "type": "string",
+          "description": "Kaedah pembayaran jika ada infaq (Billplz FPX / DuitNow QR)"
+        },
+        "sumber": {
+          "type": "string",
+          "description": "Sumber pautan web pengirim"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Masa rekod dicipta"
+        }
+      },
+      "required": ["pengirim", "nama", "jenisHajat", "cawangan", "sumbangan", "status", "dibaca"]
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "Kakitangan atau petugas cawangan Yayasan An Nabawi yang dibenarkan mengakses portal admin",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "E-mel rasmi admin"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "superadmin", "petugas"],
+          "description": "Peranan akses pengguna"
+        },
+        "cawangan": {
+          "type": "string",
+          "description": "Cawangan petugas"
+        },
+        "addedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "role"]
+    },
+    "appSettings": {
+      "title": "AppSettings",
+      "description": "Tetapan portal termasuk senarai emel admin yang dibenarkan dan konfigurasi Billplz",
+      "type": "object",
+      "properties": {
+        "allowedAdminEmails": {
+          "type": "array",
+          "description": "Senarai emel yang dibenarkan log masuk ke portal petugas"
+        },
+        "billplzCollectionId": {
+          "type": "string",
+          "description": "ID koleksi Billplz untuk transaksi sebenar"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/kirimDoa/{docId}": {
+      "schema": "kirimDoa",
+      "description": "Koleksi permohonan doa orang awam yang dihantar melalui laman web"
+    },
+    "/admins/{uid}": {
+      "schema": "admin",
+      "description": "Koleksi pengesahan akses petugas Yayasan An Nabawi mengikut UID pengguna"
+    },
+    "/settings/{settingId}": {
+      "schema": "appSettings",
+      "description": "Tetapan global termasuk senarai emel admin yang dibenarkan"
+    }
+  }
+}
