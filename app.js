@@ -441,7 +441,6 @@ if (form) {
       state.lastSubmittedId = id;
       state.lastSubmittedPengirim = pengirim;
       showSuccess(id, pengirim, nama, state.jenisHajat);
-      renderAdminDashboard();
     } catch (err) {
       console.error(err);
       showError('Maaf, sistem sedang sibuk. Sila cuba lagi sebentar.');
@@ -522,7 +521,6 @@ confirmQrPaidBtn?.addEventListener('click', () => {
     if (receiptText) {
       receiptText.textContent = `Jazakumullahu khair. Pembayaran DuitNow QR anda telah disahkan di bawah nama ${state.lastSubmittedPengirim}.`;
     }
-    renderAdminDashboard();
   }
 });
 
@@ -712,7 +710,6 @@ function startKirimDoaRealtimeListener() {
       if (liveRecords.length > 0) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(liveRecords));
         currentRecordsList = liveRecords;
-        renderAdminDashboard();
       }
     }, (error) => {
       console.warn('Realtime sync warning (using cached data):', error);
