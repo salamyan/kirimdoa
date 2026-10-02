@@ -145,8 +145,6 @@ const searchInput = document.getElementById('adminSearchInput');
 
 const selectAllCheckbox = document.getElementById('selectAllRows');
 const selectedCountBadge = document.getElementById('selectedCountBadge');
-const quickSelectAllBtn = document.getElementById('quickSelectAllBtn');
-const quickDeselectBtn = document.getElementById('quickDeselectBtn');
 const tableBody = document.getElementById('adminTableBody');
 
 const exportCsvBtn = document.getElementById('exportCsvBtn');
@@ -159,55 +157,9 @@ const closeEmailModalBtn = document.getElementById('closeEmailMgmtBtn');
 const newEmailInput = document.getElementById('newAdminEmailInput');
 const addEmailBtn = document.getElementById('addAdminEmailBtn');
 const allowedEmailsList = document.getElementById('allowedEmailsList');
-const passcodeLoginForm = document.getElementById('passcodeLoginForm');
-const adminPasscodeInput = document.getElementById('adminPasscodeInput');
 
-// Session storage key for Petugas passcode auth
-const PETUGAS_SESSION_KEY = 'kirimdoa_petugas_session';
-
-function getPetugasSession() {
-  try {
-    const raw = sessionStorage.getItem(PETUGAS_SESSION_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data && data.authenticated) return data;
-    }
-  } catch (e) {}
-  return null;
-}
-
-function setPetugasSession(email = 'admin@yayasanannabawi.com') {
-  sessionStorage.setItem(PETUGAS_SESSION_KEY, JSON.stringify({ authenticated: true, email }));
-}
-
-function clearPetugasSession() {
-  sessionStorage.removeItem(PETUGAS_SESSION_KEY);
-}
-
-// Check initial session or Firebase Auth
-function checkAdminAccess() {
-  const petugasSession = getPetugasSession();
-  if (petugasSession) {
-    if (authGate) authGate.style.display = 'none';
-    if (mainDashboard) mainDashboard.style.display = 'block';
-    if (userSection) userSection.style.display = 'flex';
-    if (userEmailEl) userEmailEl.textContent = petugasSession.email + ' (Petugas)';
-    if (authErrorMsg) authErrorMsg.style.display = 'none';
-
-    startRealtimeListener();
-    renderDashboard();
-    return true;
-  }
-  return false;
-}
-
-// Check session on load
-checkAdminAccess();
-
-// 1. Auth Handling
+// 1. Auth Handling (Google / Email Login Only)
 onAuthStateChanged(auth, (user) => {
-  if (getPetugasSession()) return; // Already logged in via passcode
-
   if (user) {
     const email = (user.email || '').toLowerCase();
     const allowed = getAllowedAdminEmails().map((e) => e.toLowerCase());
@@ -233,34 +185,15 @@ onAuthStateChanged(auth, (user) => {
       }
     }
   } else {
-    if (!getPetugasSession()) {
-      if (authGate) authGate.style.display = 'block';
-      if (mainDashboard) mainDashboard.style.display = 'none';
-      if (userSection) userSection.style.display = 'none';
-      if (userEmailEl) userEmailEl.textContent = '';
-      if (authErrorMsg) authErrorMsg.style.display = 'none';
+    if (authGate) authGate.style.display = 'block';
+    if (mainDashboard) mainDashboard.style.display = 'none';
+    if (userSection) userSection.style.display = 'none';
+    if (userEmailEl) userEmailEl.textContent = '';
+    if (authErrorMsg) authErrorMsg.style.display = 'none';
 
-      if (unsubscribeListener) {
-        unsubscribeListener();
-        unsubscribeListener = null;
-      }
-    }
-  }
-});
-
-// Passcode login submission
-passcodeLoginForm?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (authErrorMsg) authErrorMsg.style.display = 'none';
-  const val = adminPasscodeInput?.value?.trim();
-  // Valid passcodes: annabawi2026, yayasan2026, or custom
-  if (val === 'annabawi2026' || val === 'yayasan2026' || val === 'kirimdoa2026') {
-    setPetugasSession('admin@yayasanannabawi.com');
-    checkAdminAccess();
-  } else {
-    if (authErrorMsg) {
-      authErrorMsg.style.display = 'block';
-      authErrorMsg.textContent = 'Kata laluan petugas tidak tepat. Sila semak semula.';
+    if (unsubscribeListener) {
+      unsubscribeListener();
+      unsubscribeListener = null;
     }
   }
 });
@@ -276,9 +209,8 @@ googleSignInBtn?.addEventListener('click', async () => {
       const msg = err.message || String(err);
       if (msg.includes('unauthorized-domain') || err.code === 'auth/unauthorized-domain') {
         authErrorMsg.innerHTML = `
-          <strong>Domain Vercel Belum Didaftarkan di Firebase Auth:</strong><br>
-          Sila ke <strong>Firebase Console &gt; Authentication &gt; Settings &gt; Authorized domains</strong> dan tambahkan domain <code>${window.location.hostname}</code> (atau <code>vercel.app</code>).<br><br>
-          <em>👉 Anda boleh terus log masuk sekarang menggunakan <strong>Kata Laluan Petugas</strong> di atas (kata laluan: <code>annabawi2026</code>).</em>
+          <strong>Domain Belum Didaftarkan di Firebase Auth:</strong><br>
+          Sila daftarkan domain <code>${window.location.hostname}</code> (atau <code>vercel.app</code>) ke dalam <strong>Authorized Domains</strong> di Firebase Console &gt; Authentication &gt; Settings &gt; Authorized domains.
         `;
       } else {
         authErrorMsg.textContent = 'Gagal log masuk: ' + msg;
@@ -288,7 +220,6 @@ googleSignInBtn?.addEventListener('click', async () => {
 });
 
 adminLogoutBtn?.addEventListener('click', async () => {
-  clearPetugasSession();
   try {
     await signOut(auth);
   } catch (err) {
@@ -598,18 +529,6 @@ selectAllCheckbox?.addEventListener('change', (e) => {
   } else {
     filtered.forEach((r) => selectedIds.delete(r.id));
   }
-  renderDashboard();
-});
-
-// Quick selection buttons
-quickSelectAllBtn?.addEventListener('click', () => {
-  const filtered = getFilteredRecords();
-  filtered.forEach((r) => selectedIds.add(r.id));
-  renderDashboard();
-});
-
-quickDeselectBtn?.addEventListener('click', () => {
-  selectedIds.clear();
   renderDashboard();
 });
 

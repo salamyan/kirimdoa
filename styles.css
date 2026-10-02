@@ -389,48 +389,140 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
   margin-top: 4px;
 }
 
-.post-submit__summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
-  padding: 16px;
-  background: #FAF9F5;
-  border: 1px solid var(--line);
+/* Submission Summary Snapshot (Typewriter Receipt Style) */
+.receipt-slip {
+  background: #FAF8F2;
+  border: 1.5px dashed #D4CCBA;
   border-radius: var(--r-md);
+  padding: 16px 20px;
+  font-family: 'Courier New', Courier, 'Lucida Console', Monaco, monospace;
+  color: #24221E;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
-.summary-item {
+.receipt-slip__header {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.receipt-slip__badge {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #1A1815;
+  display: block;
+}
+
+.receipt-slip__sub {
+  font-size: 11px;
+  color: #7A7468;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+.receipt-slip__line {
+  border-bottom: 1px dashed #D8D0BE;
+  margin: 12px 0;
+}
+
+.receipt-slip__table {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 9px;
 }
 
-.summary-item--full {
-  grid-column: 1 / -1;
-}
-
-.summary-label {
-  font-size: 11.5px;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--muted-2);
-  font-weight: 600;
-}
-
-.summary-val {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: var(--ink);
+.receipt-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13.5px;
   line-height: 1.4;
+}
+
+.receipt-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #696357;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.receipt-dots {
+  flex: 1;
+  border-bottom: 1px dotted #DDD4C0;
+  margin: 0 4px;
+  min-width: 12px;
+}
+
+.receipt-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #171512;
+  text-align: right;
   word-break: break-word;
 }
 
-/* Waktu Dibacakan Doa (in post-submit) */
+.receipt-val--status {
+  color: #027A48;
+}
+
+.receipt-item--multiline {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.receipt-item--multiline .receipt-dots {
+  display: none;
+}
+
+.receipt-item--multiline .receipt-val {
+  text-align: left;
+  background: #F3EFE4;
+  padding: 6px 10px;
+  border-radius: 6px;
+  width: 100%;
+  border-left: 3px solid var(--accent);
+}
+
+.receipt-slip__footer {
+  text-align: center;
+  font-size: 11px;
+  color: #8C8577;
+  letter-spacing: 0.04em;
+}
+
+/* Waktu Dibacakan Doa (in post-submit - Borderless Image at Top) */
 .post-submit__waktu {
   background: #FAF8F5;
   border: 1px solid var(--line);
-  border-left: 4px solid var(--accent);
   border-radius: var(--r-md);
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.waktu-banner {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.waktu-banner__img {
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.waktu-content {
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
@@ -1576,31 +1668,41 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
     padding: 3px 10px;
   }
 
-  /* Summary snapshot */
-  .post-submit__summary {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 12px;
+  /* Receipt slip snapshot (Mobile) */
+  .receipt-slip {
     padding: 14px;
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
-  .summary-label {
-    font-size: 11px;
-    letter-spacing: .05em;
-    font-weight: 600;
+  .receipt-slip__badge {
+    font-size: 12.5px;
   }
 
-  .summary-val {
-    font-size: 14px;
-    line-height: 1.4;
-    font-weight: 600;
+  .receipt-item {
+    font-size: 12.5px;
   }
 
-  /* Waktu Doa Card */
+  .receipt-label {
+    font-size: 11.5px;
+  }
+
+  .receipt-val {
+    font-size: 12.5px;
+  }
+
+  /* Waktu Doa Card (Mobile) */
   .post-submit__waktu {
-    padding: 14px;
+    padding: 0;
     border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .waktu-banner__img {
+    max-height: 180px;
+  }
+
+  .waktu-content {
+    padding: 14px;
     gap: 8px;
   }
 

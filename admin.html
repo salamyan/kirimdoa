@@ -67,20 +67,6 @@
         Log Masuk Petugas (Google)
       </button>
 
-      <div class="auth-divider" style="margin:24px auto 16px; max-width:320px; display:flex; align-items:center; text-align:center; color:var(--muted); font-size:12px; font-weight:600;">
-        <span style="flex:1; border-bottom:1px solid var(--border);"></span>
-        <span style="padding:0 12px; letter-spacing:0.05em;">ATAU KATA LALUAN</span>
-        <span style="flex:1; border-bottom:1px solid var(--border);"></span>
-      </div>
-
-      <!-- Fallback Passcode Login Form -->
-      <form id="passcodeLoginForm" style="max-width:320px; margin:0 auto; display:flex; flex-direction:column; gap:8px;">
-        <div style="display:flex; gap:8px;">
-          <input type="password" id="adminPasscodeInput" placeholder="Kata laluan petugas" required class="input" style="flex:1; padding:8px 12px; border-radius:8px; border:1px solid var(--border); font-size:14px;" />
-          <button type="submit" class="btn btn--outline" style="padding:8px 16px; font-size:14px; white-space:nowrap;">Log Masuk</button>
-        </div>
-      </form>
-
       <div id="authErrorMsg" class="auth-error-box" style="display:none; max-width:440px; margin:16px auto 0; text-align:left; font-size:13px; line-height:1.5;"></div>
 
       <div class="auth-note" style="margin-top:16px;">
@@ -127,8 +113,6 @@
           <div class="panel-quick-actions">
             <div class="panel-selection-controls">
               <span id="selectedCountBadge" class="selected-pill">Semua rekod dipaparkan</span>
-              <button type="button" id="quickSelectAllBtn" class="btn btn--sm btn--soft" style="font-size:12px; min-height:34px; padding:0 10px;">Pilih Semua</button>
-              <button type="button" id="quickDeselectBtn" class="btn btn--sm btn--ghost" style="font-size:12px; min-height:34px; padding:0 8px;">Nyahpilih</button>
             </div>
             
             <button type="button" id="adminManageEmailsBtn" class="btn btn--sm btn--soft" title="Urus senarai emel petugas">

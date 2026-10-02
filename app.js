@@ -302,18 +302,8 @@ const postCustomAmt = document.getElementById('postCustomAmt');
 const postBillplzAmtLabel = document.getElementById('postBillplzAmtLabel');
 const btnBillplzAmtText = document.getElementById('btnBillplzAmtText');
 const postBillplzBtn = document.getElementById('postBillplzBtn');
-const paySimBtn = document.getElementById('paySimBtn');
 const paidReceiptNotice = document.getElementById('paidReceiptNotice');
 const receiptText = document.getElementById('receiptText');
-
-// Pay Sim Modal
-const paySimModal = document.getElementById('paySimModal');
-const closePaySimBtn = document.getElementById('closePaySimBtn');
-const cancelSimPayBtn = document.getElementById('cancelSimPayBtn');
-const confirmSimPayBtn = document.getElementById('confirmSimPayBtn');
-const simRefId = document.getElementById('simRefId');
-const simSenderName = document.getElementById('simSenderName');
-const simAmountLabel = document.getElementById('simAmountLabel');
 
 // State
 const state = {
@@ -471,11 +461,6 @@ function showSuccess(id, pengirim, nama, jenisHajat) {
   // Reset Billplz Amount to 30
   updateBillplzAmount(30);
 
-  // Setup Simulation Modal default data
-  simRefId.textContent = id;
-  simSenderName.textContent = pengirim;
-  simAmountLabel.textContent = `RM${postDonationAmount}`;
-
   successEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   successEl.focus({ preventScroll: true });
 }
@@ -588,18 +573,6 @@ document.getElementById('shareBtn')?.addEventListener('click', async () => {
   const waUrl = `https://wa.me/?text=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`;
   window.open(waUrl, '_blank', 'noopener,noreferrer');
 });
-
-// ---------- Payment Simulation Modal Handlers ----------
-paySimBtn?.addEventListener('click', () => {
-  paySimModal.hidden = false;
-});
-
-function closePaySim() {
-  paySimModal.hidden = true;
-}
-
-closePaySimBtn?.addEventListener('click', closePaySim);
-cancelSimPayBtn?.addEventListener('click', closePaySim);
 
 // ---------- Admin Portal Auth & Realtime Sync Logic ----------
 const adminAuthGate = document.getElementById('adminAuthGate');
@@ -815,8 +788,6 @@ function updateBillplzAmount(amt) {
     .replace('{amount}', amt)
     .replace('{id}', encodeURIComponent(state.lastSubmittedId || 'demo'));
   if (postBillplzBtn) postBillplzBtn.href = generatedUrl;
-
-  if (simAmountLabel) simAmountLabel.textContent = `RM${amt}`;
 }
 
 // Handle Direct Billplz FPX API Checkout when button clicked
@@ -905,18 +876,6 @@ async function checkBillplzReturnStatus() {
   }
 }
 checkBillplzReturnStatus();
-
-// Payment simulation & confirm paid
-confirmSimPayBtn?.addEventListener('click', async () => {
-  if (state.lastSubmittedId) {
-    await updateRecordBoth(state.lastSubmittedId, { status: 'dibayar', sumbangan: postDonationAmount, kaedah: 'Billplz FPX' });
-    paidReceiptNotice.hidden = false;
-    if (receiptText) {
-      receiptText.textContent = `Jazakumullahu khair. Sumbangan RM${postDonationAmount} melalui Billplz FPX telah disahkan!`;
-    }
-    closePaySim();
-  }
-});
 
 // QR Paid Confirm
 confirmQrPaidBtn?.addEventListener('click', async () => {
