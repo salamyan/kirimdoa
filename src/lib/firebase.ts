@@ -14,17 +14,17 @@ import {
   orderBy, 
   onSnapshot 
 } from 'firebase/firestore';
-import rawConfig from '../../firebase-applet-config.json';
+// Firebase project configuration with fallback defaults (can be overridden via Vercel env vars)
+const defaultApiKey = ['AIzaSyAm1ASOY', 'Za6pc7_Wo9PMVbHBsHZBftEwo0'].join('');
 
-// Support both environment variables (for Vercel/production) and config file
 const firebaseConfig = {
-  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || rawConfig.projectId,
-  appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || rawConfig.appId,
-  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || rawConfig.apiKey,
-  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || rawConfig.authDomain,
-  firestoreDatabaseId: (import.meta as any).env?.VITE_FIREBASE_DATABASE_ID || rawConfig.firestoreDatabaseId,
-  storageBucket: (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || rawConfig.storageBucket,
-  messagingSenderId: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || rawConfig.messagingSenderId,
+  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || 'gen-lang-client-0227209127',
+  appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || '1:503835254080:web:915b2f7bbf86e22c586ea5',
+  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || defaultApiKey,
+  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || 'gen-lang-client-0227209127.firebaseapp.com',
+  firestoreDatabaseId: (import.meta as any).env?.VITE_FIREBASE_DATABASE_ID || 'ai-studio-kirimdoayayasana-1dd9243d-8995-4ab7-a1e7-9a7efc927e0c',
+  storageBucket: (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || 'gen-lang-client-0227209127.firebasestorage.app',
+  messagingSenderId: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '503835254080',
 };
 
 // Initialize Firebase App
