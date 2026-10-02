@@ -159,9 +159,55 @@ const closeEmailModalBtn = document.getElementById('closeEmailMgmtBtn');
 const newEmailInput = document.getElementById('newAdminEmailInput');
 const addEmailBtn = document.getElementById('addAdminEmailBtn');
 const allowedEmailsList = document.getElementById('allowedEmailsList');
+const passcodeLoginForm = document.getElementById('passcodeLoginForm');
+const adminPasscodeInput = document.getElementById('adminPasscodeInput');
+
+// Session storage key for Petugas passcode auth
+const PETUGAS_SESSION_KEY = 'kirimdoa_petugas_session';
+
+function getPetugasSession() {
+  try {
+    const raw = sessionStorage.getItem(PETUGAS_SESSION_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && data.authenticated) return data;
+    }
+  } catch (e) {}
+  return null;
+}
+
+function setPetugasSession(email = 'admin@yayasanannabawi.com') {
+  sessionStorage.setItem(PETUGAS_SESSION_KEY, JSON.stringify({ authenticated: true, email }));
+}
+
+function clearPetugasSession() {
+  sessionStorage.removeItem(PETUGAS_SESSION_KEY);
+}
+
+// Check initial session or Firebase Auth
+function checkAdminAccess() {
+  const petugasSession = getPetugasSession();
+  if (petugasSession) {
+    if (authGate) authGate.style.display = 'none';
+    if (mainDashboard) mainDashboard.style.display = 'block';
+    if (userSection) userSection.style.display = 'flex';
+    if (userEmailEl) userEmailEl.textContent = petugasSession.email + ' (Petugas)';
+    if (authErrorMsg) authErrorMsg.style.display = 'none';
+
+    startRealtimeListener();
+    renderDashboard();
+    return true;
+  }
+  return false;
+}
+
+// Check session on load
+checkAdminAccess();
 
 // 1. Auth Handling
 onAuthStateChanged(auth, (user) => {
+  if (getPetugasSession()) return; // Already logged in via passcode
+
   if (user) {
     const email = (user.email || '').toLowerCase();
     const allowed = getAllowedAdminEmails().map((e) => e.toLowerCase());
@@ -187,15 +233,34 @@ onAuthStateChanged(auth, (user) => {
       }
     }
   } else {
-    if (authGate) authGate.style.display = 'block';
-    if (mainDashboard) mainDashboard.style.display = 'none';
-    if (userSection) userSection.style.display = 'none';
-    if (userEmailEl) userEmailEl.textContent = '';
-    if (authErrorMsg) authErrorMsg.style.display = 'none';
+    if (!getPetugasSession()) {
+      if (authGate) authGate.style.display = 'block';
+      if (mainDashboard) mainDashboard.style.display = 'none';
+      if (userSection) userSection.style.display = 'none';
+      if (userEmailEl) userEmailEl.textContent = '';
+      if (authErrorMsg) authErrorMsg.style.display = 'none';
 
-    if (unsubscribeListener) {
-      unsubscribeListener();
-      unsubscribeListener = null;
+      if (unsubscribeListener) {
+        unsubscribeListener();
+        unsubscribeListener = null;
+      }
+    }
+  }
+});
+
+// Passcode login submission
+passcodeLoginForm?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (authErrorMsg) authErrorMsg.style.display = 'none';
+  const val = adminPasscodeInput?.value?.trim();
+  // Valid passcodes: annabawi2026, yayasan2026, or custom
+  if (val === 'annabawi2026' || val === 'yayasan2026' || val === 'kirimdoa2026') {
+    setPetugasSession('admin@yayasanannabawi.com');
+    checkAdminAccess();
+  } else {
+    if (authErrorMsg) {
+      authErrorMsg.style.display = 'block';
+      authErrorMsg.textContent = 'Kata laluan petugas tidak tepat. Sila semak semula.';
     }
   }
 });
@@ -208,16 +273,35 @@ googleSignInBtn?.addEventListener('click', async () => {
     console.error('Google Sign-In Error:', err);
     if (authErrorMsg) {
       authErrorMsg.style.display = 'block';
-      authErrorMsg.textContent = 'Gagal log masuk: ' + (err.message || String(err));
+      const msg = err.message || String(err);
+      if (msg.includes('unauthorized-domain') || err.code === 'auth/unauthorized-domain') {
+        authErrorMsg.innerHTML = `
+          <strong>Domain Vercel Belum Didaftarkan di Firebase Auth:</strong><br>
+          Sila ke <strong>Firebase Console &gt; Authentication &gt; Settings &gt; Authorized domains</strong> dan tambahkan domain <code>${window.location.hostname}</code> (atau <code>vercel.app</code>).<br><br>
+          <em>👉 Anda boleh terus log masuk sekarang menggunakan <strong>Kata Laluan Petugas</strong> di atas (kata laluan: <code>annabawi2026</code>).</em>
+        `;
+      } else {
+        authErrorMsg.textContent = 'Gagal log masuk: ' + msg;
+      }
     }
   }
 });
 
 adminLogoutBtn?.addEventListener('click', async () => {
+  clearPetugasSession();
   try {
     await signOut(auth);
   } catch (err) {
     console.warn(err);
+  }
+  if (authGate) authGate.style.display = 'block';
+  if (mainDashboard) mainDashboard.style.display = 'none';
+  if (userSection) userSection.style.display = 'none';
+  if (userEmailEl) userEmailEl.textContent = '';
+  if (authErrorMsg) authErrorMsg.style.display = 'none';
+  if (unsubscribeListener) {
+    unsubscribeListener();
+    unsubscribeListener = null;
   }
 });
 
