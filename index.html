@@ -6,20 +6,49 @@
   <title>Kirim Doa — Yayasan An Nabawi</title>
   <meta name="description" content="Kirim nama dan hajat anda untuk didoakan oleh para pelajar tahfiz di empat cawangan Yayasan An Nabawi. Percuma, sumbangan hanya pilihan.">
   
+  <!-- Google Indexing, SEO & Canonical -->
+  <link rel="canonical" href="https://yayasanannabawi.com/kirim-doa">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="keywords" content="kirim doa, doa huffaz, yayasan an nabawi, doa berbuka puasa, tajaan iftar tahfiz, taja makanan berbuka, maahad tahfiz al-azhari, sedekah ramadhan, infaq tahfiz, machang, shah alam, jerantut, langkawi">
+  <meta name="author" content="Yayasan An Nabawi">
+  <meta name="theme-color" content="#1B2D78">
+  <link rel="icon" type="image/png" href="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png">
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yayasanannabawi.com/kirim-doa">
   <meta property="og:title" content="Kirim Doa — Yayasan An Nabawi">
   <meta property="og:description" content="Kirim nama & hajat anda. Para huffaz kami doakan di 4 cawangan tahfiz YAN. Percuma, sumbangan hanya pilihan.">
-  <meta property="og:image" content="/images/og-image.jpg">
+  <meta property="og:image" content="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ogkirimdoa.png">
+  <meta property="og:image:secure_url" content="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ogkirimdoa.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Kirim Doa — Yayasan An Nabawi">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Kirim Doa — Yayasan An Nabawi">
   <meta name="twitter:description" content="Kirim nama & hajat anda. Para huffaz kami doakan di 4 cawangan tahfiz YAN. Percuma, sumbangan hanya pilihan.">
-  <meta name="twitter:image" content="/images/og-image.jpg">
+  <meta name="twitter:image" content="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ogkirimdoa.png">
+  <meta name="twitter:image:alt" content="Kirim Doa — Yayasan An Nabawi">
+
+  <!-- Google tag (gtag.js) - Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-X114562089" id="gaScriptTag"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    // Konfigurasi Google Analytics dengan fallback ID fleksibel
+    const currentGaId = localStorage.getItem('yan_ga_measurement_id') || 'G-X114562089';
+    gtag('config', currentGaId, {
+      send_page_view: true,
+      page_title: document.title,
+      page_location: window.location.href
+    });
+  </script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,25 +58,89 @@
   <link rel="stylesheet" href="/styles.css">
   <script src="https://www.youtube.com/iframe_api"></script>
 
-  <!-- JSON-LD Structured Data for Charity Campaign -->
+  <!-- JSON-LD Structured Data for Google Index & Rich Snippets (WebSite, NGO, FAQPage) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "NGO",
-    "name": "Yayasan An Nabawi",
-    "url": "https://yayasanannabawi.com",
-    "logo": "https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png",
-    "description": "Kempen Kirim Doa bersama pelajar tahfiz Yayasan An Nabawi di Machang, Shah Alam, Jerantut dan Langkawi.",
-    "telephone": "014-9200024",
-    "email": "salam@yayasanannabawi.com",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "No 23-3, Jalan Pegaga B U12/B, Desa Alam, Seksyen U12",
-      "addressLocality": "Shah Alam",
-      "addressRegion": "Selangor",
-      "postalCode": "40170",
-      "addressCountry": "MY"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://yayasanannabawi.com/kirim-doa#website",
+        "url": "https://yayasanannabawi.com/kirim-doa",
+        "name": "Kirim Doa — Yayasan An Nabawi",
+        "description": "Kirim nama dan hajat anda untuk didoakan oleh para pelajar tahfiz di empat cawangan Yayasan An Nabawi.",
+        "inLanguage": "ms-MY"
+      },
+      {
+        "@type": "NGO",
+        "@id": "https://yayasanannabawi.com/#organization",
+        "name": "Yayasan An Nabawi",
+        "url": "https://yayasanannabawi.com",
+        "logo": "https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png",
+        "image": "https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/ogkirimdoa.png",
+        "description": "Pusat Tarbiah & Pengajian Al-Quran Yayasan An Nabawi di Machang, Shah Alam, Jerantut dan Langkawi.",
+        "telephone": "+60149200024",
+        "email": "salam@yayasanannabawi.com",
+        "sameAs": [
+          "https://www.facebook.com/tahfizannabawi/",
+          "https://www.tiktok.com/@yayasanannabawi"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No 23-3, Jalan Pegaga B U12/B, Desa Alam, Seksyen U12",
+          "addressLocality": "Shah Alam",
+          "addressRegion": "Selangor",
+          "postalCode": "40170",
+          "addressCountry": "MY"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://yayasanannabawi.com/kirim-doa#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Adakah perkhidmatan Kirim Doa ini benar-benar percuma?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ya, seratus peratus percuma. Anda boleh menghantar nama dan apa jua hajat yang baik tanpa sebarang syarat pembayaran. Sumbangan hanyalah pilihan sukarela bagi yang berkemampuan untuk menyokong makan minum harian serta pengajian anak-anak tahfiz asnaf."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bilakah doa dan hajat ini dibacakan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Senarai nama disusun dan dibacakan sejurus sebelum waktu berbuka puasa di keempat-empat cawangan YAN (Machang, Shah Alam, Jerantut, Langkawi)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bagaimana saya mengetahui doa saya telah dibacakan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sekiranya anda menyertakan nombor WhatsApp, petugas kami akan menghantar makluman ringkas dan pautan rakaman lensa sesi bacaan doa tersebut setelah sesi selesai."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bolehkah saya menghantar nama untuk ahli keluarga yang telah meninggal dunia (arwah)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Boleh. Pilih jenis hajat 'Untuk arwah', dan para pelajar tahfiz kami akan menitipkan bacaan doa khusus serta tahlil ringkas untuk dihadiahkan kepada arwah yang dinamakan."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Ke mana wang sumbangan disalurkan jika saya memilih untuk menyumbang?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sumbangan disalurkan secara terus ke Tabung Kebajikan & Pendidikan Yayasan An Nabawi untuk menampung kos makan minum berkhasiat harian, yuran pelajar asnaf, kitab pengajian dan operasi asrama keempat-empat madrasah tahfiz kami."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 </head>
@@ -352,22 +445,22 @@
         <div class="branch">
           <span class="branch__no">01</span>
           <h3>Machang</h3>
-          <p>Maahad Tahfiz Integrasi Al-Azhari, Bukit Bakar, Kelantan</p>
+          <p>Maahad Tahfiz Integrasi Al-Azhari, Machang, Kelantan</p>
         </div>
         <div class="branch">
           <span class="branch__no">02</span>
           <h3>Shah Alam</h3>
-          <p>Maahad Tahfiz An Nabawi, Seksyen 7, Selangor</p>
+          <p>Maahad Tahfiz An Nabawi, Shah Alam, Selangor</p>
         </div>
         <div class="branch">
           <span class="branch__no">03</span>
           <h3>Jerantut</h3>
-          <p>Maahad Tahfiz An Nabawi Cawangan Jerantut, Pahang</p>
+          <p>Maahad Tahfiz An Nabawi, Jerantut, Pahang</p>
         </div>
         <div class="branch">
           <span class="branch__no">04</span>
           <h3>Langkawi</h3>
-          <p>Pusat Tahfiz &amp; Tarbiah Al-Quran Langkawi, Kedah</p>
+          <p>Maahad Tahfiz An Nabawi, Langkawi, Kedah</p>
         </div>
       </div>
     </div>
@@ -429,31 +522,97 @@
 
 <!-- FOOTER -->
 <footer class="footer">
-  <div class="wrap footer__inner">
-    <div class="footer__col">
-      <a href="/" class="footer__brand" aria-label="Yayasan An Nabawi">
-        <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png" alt="Yayasan An Nabawi" class="footer__logo" loading="lazy">
-      </a>
-      <div class="footer__info">
-        <strong style="color:var(--ground); font-weight:600;">Yayasan An Nabawi</strong><br>
-        No 23-3, Jalan Pegaga B U12/B,<br>
-        Desa Alam, Seksyen U12,<br>
-        40170 Shah Alam, Selangor<br>
-        <span style="display:inline-block; margin-top:6px;">
-          Telefon: <a href="https://wa.me/60149200024" target="_blank" rel="noopener noreferrer" style="color:var(--ground); font-weight:500;" data-config="telefon">014-9200024</a> · E-mel: <a href="mailto:salam@yayasanannabawi.com" style="color:var(--ground);">salam@yayasanannabawi.com</a>
-        </span>
+  <div class="wrap footer__container">
+    <div class="footer__grid">
+      <!-- Col 1: Brand & Ibu Pejabat -->
+      <div class="footer__col footer__col--brand">
+        <a href="/" class="footer__brand" aria-label="Yayasan An Nabawi">
+          <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/putih.png" alt="Yayasan An Nabawi" class="footer__logo" loading="lazy">
+        </a>
+        <p class="footer__tagline">
+          Inisiatif Kirim Doa Huffaz — Menghubungkan titipan hajat para penyokong dengan doa para pelajar tahfiz Yayasan An Nabawi sebelum waktu berbuka puasa.
+        </p>
+        <div class="footer__address">
+          <span class="footer__label">Ibu Pejabat:</span>
+          <p>No 23-3, Jalan Pegaga B U12/B, Desa Alam, Seksyen U12, 40170 Shah Alam, Selangor</p>
+        </div>
+      </div>
+
+      <!-- Col 2: 4 Cawangan Tahfiz -->
+      <div class="footer__col footer__col--branches">
+        <h4 class="footer__heading">4 Cawangan Tahfiz</h4>
+        <ul class="footer__branch-list">
+          <li>
+            <span class="footer__bullet">01</span>
+            <div>
+              <strong>Machang, Kelantan</strong>
+              <small>Maahad Tahfiz Integrasi Al-Azhari</small>
+            </div>
+          </li>
+          <li>
+            <span class="footer__bullet">02</span>
+            <div>
+              <strong>Shah Alam, Selangor</strong>
+              <small>Maahad Tahfiz An Nabawi</small>
+            </div>
+          </li>
+          <li>
+            <span class="footer__bullet">03</span>
+            <div>
+              <strong>Jerantut, Pahang</strong>
+              <small>Maahad Tahfiz An Nabawi</small>
+            </div>
+          </li>
+          <li>
+            <span class="footer__bullet">04</span>
+            <div>
+              <strong>Langkawi, Kedah</strong>
+              <small>Maahad Tahfiz An Nabawi</small>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Hubungi & Media Sosial -->
+      <div class="footer__col footer__col--contact">
+        <h4 class="footer__heading">Hubungi &amp; Media Sosial</h4>
+        <div class="footer__contact-list">
+          <a href="https://wa.me/60149200024" target="_blank" rel="noopener noreferrer" class="footer__contact-item" data-config="telefon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>014-920 0024 (WhatsApp)</span>
+          </a>
+          <a href="mailto:salam@yayasanannabawi.com" class="footer__contact-item">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>salam@yayasanannabawi.com</span>
+          </a>
+        </div>
+
+        <div class="footer__social-wrap">
+          <span class="footer__social-label">Ikuti Perkembangan Huffaz:</span>
+          <div class="footer__social-row">
+            <a href="https://www.facebook.com/tahfizannabawi/" target="_blank" rel="noopener noreferrer" class="social-btn" data-config-href="facebook">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              <span>Facebook</span>
+            </a>
+            <a href="https://www.tiktok.com/@yayasanannabawi" target="_blank" rel="noopener noreferrer" class="social-btn" data-config-href="tiktok">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+              <span>TikTok</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="footer__col footer__col--end">
-      <div class="social">
-        <a href="https://www.facebook.com/tahfizannabawi/" target="_blank" rel="noopener noreferrer" data-config-href="facebook">Facebook</a>
-        <a href="https://www.tiktok.com/@yayasanannabawi" target="_blank" rel="noopener noreferrer" data-config-href="tiktok">TikTok</a>
+
+    <!-- Bottom Bar -->
+    <div class="footer__bottom">
+      <div class="footer__copyright">
+        <small>© <span id="year"></span> Yayasan An Nabawi. Hak cipta terpelihara.</small>
       </div>
-      <div style="display:flex; gap:16px; align-items:center;">
-        <a href="/admin.html" class="footer__admin-link" title="Buka Portal Petugas Pentadbir">
+      <div class="footer__admin-wrap">
+        <a href="/admin.html" class="footer__admin-pill" title="Buka Portal Petugas Pentadbir">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Portal Petugas (Admin)
         </a>
-        <small>© <span id="year"></span> Yayasan An Nabawi. Hak cipta terpelihara.</small>
       </div>
     </div>
   </div>

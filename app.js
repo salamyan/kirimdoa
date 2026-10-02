@@ -62,6 +62,17 @@ export const CONFIG = {
   maxNames: 3,
 };
 
+// Google Analytics 4 (GA4) Tracking Helper
+export function trackGAEvent(eventName, params = {}) {
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventName, params);
+    }
+  } catch (err) {
+    console.debug('GA tracking error:', err);
+  }
+}
+
 // ---------- Default Sample Data for Realistic Testing ----------
 const SEED_DATA = [
   {
@@ -432,6 +443,15 @@ if (form) {
       state.lastSubmittedId = id;
       state.lastSubmittedPengirim = pengirim;
       state.lastSubmittedTelefon = telefon;
+      
+      // Track conversion event in Google Analytics
+      trackGAEvent('kirim_doa_submit', {
+        event_category: 'Engagement',
+        jenis_hajat: state.jenisHajat,
+        bilangan_nama: nama.length,
+        ada_telefon: !!telefon
+      });
+
       showSuccess(id, pengirim, nama, state.jenisHajat);
     } catch (err) {
       console.error(err);
@@ -565,11 +585,13 @@ document.getElementById('shareBtn')?.addEventListener('click', async () => {
   if (navigator.share) {
     try {
       await navigator.share(shareData);
+      trackGAEvent('share_campaign', { method: 'WebShare' });
       return;
     } catch (e) {
       // fallback to WhatsApp
     }
   }
+  trackGAEvent('share_campaign', { method: 'WhatsApp' });
   const waUrl = `https://wa.me/?text=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`;
   window.open(waUrl, '_blank', 'noopener,noreferrer');
 });
@@ -794,6 +816,14 @@ function updateBillplzAmount(amt) {
 postBillplzBtn?.addEventListener('click', async (e) => {
   e.preventDefault();
   const amt = postDonationAmount || 30;
+  
+  // Track GA donation checkout event
+  trackGAEvent('tajaan_iftar_billplz_click', {
+    event_category: 'Donation',
+    amount: amt,
+    currency: 'MYR'
+  });
+
   const originalHtml = postBillplzBtn.innerHTML;
   postBillplzBtn.style.pointerEvents = 'none';
   postBillplzBtn.innerHTML = `Menghubungkan FPX... <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
@@ -881,6 +911,13 @@ checkBillplzReturnStatus();
 confirmQrPaidBtn?.addEventListener('click', async () => {
   if (state.lastSubmittedId) {
     await updateRecordBoth(state.lastSubmittedId, { status: 'dibayar', sumbangan: 10, kaedah: 'DuitNow QR' });
+    
+    trackGAEvent('tajaan_iftar_qr_confirm', {
+      event_category: 'Donation',
+      method: 'DuitNow QR',
+      currency: 'MYR'
+    });
+
     paidReceiptNotice.hidden = false;
     if (receiptText) {
       receiptText.textContent = `Jazakumullahu khair. Pembayaran DuitNow QR anda telah disahkan di bawah nama ${state.lastSubmittedPengirim}.`;

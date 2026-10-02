@@ -927,5 +927,35 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// Google Analytics (GA4) Configuration Logic
+const adminGaConfigBtn = document.getElementById('adminGaConfigBtn');
+const gaConfigModal = document.getElementById('gaConfigModal');
+const closeGaConfigBtn = document.getElementById('closeGaConfigBtn');
+const saveGaConfigBtn = document.getElementById('saveGaConfigBtn');
+const gaMeasurementIdInput = document.getElementById('gaMeasurementIdInput');
+
+adminGaConfigBtn?.addEventListener('click', () => {
+  if (gaMeasurementIdInput) {
+    gaMeasurementIdInput.value = localStorage.getItem('yan_ga_measurement_id') || '';
+  }
+  if (gaConfigModal) gaConfigModal.hidden = false;
+});
+
+closeGaConfigBtn?.addEventListener('click', () => {
+  if (gaConfigModal) gaConfigModal.hidden = true;
+});
+
+saveGaConfigBtn?.addEventListener('click', () => {
+  const val = (gaMeasurementIdInput?.value || '').trim();
+  if (val) {
+    localStorage.setItem('yan_ga_measurement_id', val);
+    alert(`Google Analytics Measurement ID (${val}) berjaya disimpan!`);
+  } else {
+    localStorage.removeItem('yan_ga_measurement_id');
+    alert('Tetapan Google Analytics telah ditetapkan semula ke nilai lalai.');
+  }
+  if (gaConfigModal) gaConfigModal.hidden = true;
+});
+
 // Initial boot
 renderDashboard();

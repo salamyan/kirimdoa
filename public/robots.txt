@@ -1,0 +1,15 @@
+# robots.txt for Kirim Doa - Yayasan An Nabawi
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+# Major search engines
+User-agent: Googlebot
+Allow: /
+Disallow: /admin.html
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin.html
+
+Sitemap: https://yayasanannabawi.com/sitemap.xml
