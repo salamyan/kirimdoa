@@ -273,6 +273,58 @@
     </div>
   </div>
 
+  <!-- PDF BRANCH SELECTION MODAL -->
+  <div id="pdfBranchModal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="pdfBranchTitle">
+    <div class="modal" style="max-width: 540px;">
+      <div class="modal__header">
+        <div>
+          <h3 id="pdfBranchTitle" class="h3" style="margin-bottom:2px; font-size:18px; font-weight:700;">Pilihan Cawangan Muat Turun PDF (A4)</h3>
+          <p class="small muted" style="margin:0;">Pilih cawangan tahfiz yang terlibat untuk agihan senarai nama doa.</p>
+        </div>
+        <button type="button" class="modal__close" id="closePdfBranchBtn" aria-label="Tutup modal">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:8px; border-bottom:1px solid var(--line);">
+          <span style="font-size:13px; font-weight:600; color:var(--ink);">Cawangan Terlibat:</span>
+          <button type="button" id="toggleAllBranchesBtn" class="btn btn--sm btn--soft" style="font-size:11.5px; padding:3px 10px;">
+            Pilih Semua (4 Cawangan)
+          </button>
+        </div>
+
+        <div class="branch-options-grid" id="branchOptionsList">
+          <label class="branch-option-card">
+            <input type="checkbox" name="pdfBranch" value="Maahad Tahfiz Integrasi Al-Azhari Machang" checked>
+            <span class="branch-option-label">1. Maahad Tahfiz Integrasi Al-Azhari Machang</span>
+          </label>
+          <label class="branch-option-card">
+            <input type="checkbox" name="pdfBranch" value="Maahad Tahfiz An Nabawi Shah Alam" checked>
+            <span class="branch-option-label">2. Maahad Tahfiz An Nabawi Shah Alam</span>
+          </label>
+          <label class="branch-option-card">
+            <input type="checkbox" name="pdfBranch" value="Maahad Tahfiz An Nabawi Jerantut" checked>
+            <span class="branch-option-label">3. Maahad Tahfiz An Nabawi Jerantut</span>
+          </label>
+          <label class="branch-option-card">
+            <input type="checkbox" name="pdfBranch" value="Maahad Tahfiz An Nabawi Langkawi" checked>
+            <span class="branch-option-label">4. Maahad Tahfiz An Nabawi Langkawi</span>
+          </label>
+        </div>
+
+        <div style="background:#FAF8F4; border:1px solid var(--line); padding:10px 12px; border-radius:var(--r-sm); font-size:12px; color:var(--muted); line-height:1.45;">
+          💡 <strong>Nota Agihan:</strong> Senarai doa akan dibahagikan secara rawak dan sama rata khusus kepada cawangan yang ditandakan sahaja. Setiap cawangan yang dipilih akan bermula pada halaman A4 baharu.
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+          <button type="button" id="cancelPdfBranchBtn" class="btn btn--ghost" style="min-height:40px;">Batal</button>
+          <button type="button" id="confirmGeneratePdfBtn" class="btn btn--accent" style="min-height:40px; gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" y2="3"/></svg>
+            Jana &amp; Muat Turun PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/admin.js"></script>
 </body>
 </html>

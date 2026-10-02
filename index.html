@@ -341,26 +341,36 @@
                 <img src="https://cxggerwxhwmicuzn.public.blob.vercel-storage.com/qronly.png" alt="Kod QR DuitNow Yayasan An Nabawi" class="qr-image" width="160" height="160" loading="eager">
               </div>
 
-              <p class="qr-scan-hint">Imbas guna mana-mana Bank atau e-Wallet (TNG, MAE, dll.)</p>
+              <p class="qr-scan-hint" style="margin-bottom:8px;">
+                <strong>Pilihan 1:</strong> Imbas kod QR di atas guna mana-mana Bank atau e-Wallet (MAE, CIMB, TNG eWallet, dll.)
+              </p>
 
               <!-- Bank Account Clean Box -->
               <div class="bank-clean-card">
+                <div style="font-size:11.5px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">
+                  Pilihan 2: Pindahan Manual (No. Akaun)
+                </div>
                 <div class="bank-clean-row">
                   <div class="bank-brand-col">
                     <span class="bank-name">Maybank</span>
                     <strong class="bank-acc-no" id="bankAccNo">5621 0686 0036</strong>
                   </div>
                   <button type="button" id="copyAccBtn" class="btn btn--sm btn--soft" style="padding:0 12px; min-height:34px; font-size:12.5px;">
-                    Salin
+                    Salin No. Akaun
                   </button>
                 </div>
-                <div class="bank-holder-text">Yayasan An Nabawi</div>
+                <div class="bank-holder-text">Yayasan An Nabawi · Boleh guna no. akaun untuk transaksi manual</div>
               </div>
 
-              <!-- Button Ringkas -->
+              <!-- Arahan Pengesahan Sumbangan -->
+              <p class="qr-confirm-instruction" style="font-size:12.5px; color:#475467; text-align:center; margin:10px 0 6px; line-height:1.45;">
+                Sila tekan butang <strong>Sahkan Sumbangan</strong> untuk kami merekodkan sumbangan anda
+              </p>
+
+              <!-- Button Sahkan Sumbangan -->
               <button type="button" id="confirmQrPaidBtn" class="btn btn--accent btn--block">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                Sahkan Pembayaran
+                Sahkan Sumbangan
               </button>
             </div>
           </div>
@@ -385,6 +395,15 @@
               <div id="postCustomAmtWrap" class="field" hidden style="margin-top:6px;">
                 <label for="postCustomAmt" style="font-size:13px;">Amaun Pilihan Sendiri (RM)</label>
                 <input id="postCustomAmt" type="number" inputmode="decimal" min="1" step="1" placeholder="cth. 25">
+              </div>
+
+              <!-- Ruang Emel Untuk Resit Rasmi Billplz -->
+              <div class="field" style="margin-top:8px;">
+                <label for="postBillplzEmail" style="font-size:12.5px; font-weight:600; color:var(--ink); display:flex; justify-content:space-between; margin-bottom:4px;">
+                  <span>E-mel Anda (untuk resit rasmi):</span>
+                  <span style="font-weight:400; color:var(--muted); font-size:11px;">(Pilihan)</span>
+                </label>
+                <input id="postBillplzEmail" type="email" placeholder="cth: nama@gmail.com" autocomplete="email" style="font-size:13.5px; min-height:40px; padding:0 12px; border:1px solid var(--line); border-radius:8px; width:100%;">
               </div>
 
               <div class="fpx-action-group">

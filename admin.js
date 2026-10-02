@@ -488,9 +488,13 @@ function renderDashboard() {
 
     const methodHtml = item.kaedah ? `<div style="font-size:11px; color:#027A48; font-weight:600; margin-top:2px;">${escapeHtml(item.kaedah)}</div>` : '';
 
+    const isQr = item.kaedah === 'Dibayar ke QR' || item.kaedah === 'DuitNow QR' || (item.status === 'dibayar' && (!item.sumbangan || Number(item.sumbangan) === 0));
+
     const statusBadge =
-      item.status === 'dibayar'
-        ? `<div><span class="badge badge--dibayar">RM${item.sumbangan} (Dibayar)</span>${methodHtml}</div>`
+      isQr
+        ? `<span class="badge badge--dibayar" style="background:#ECFDF3; color:#027A48; font-weight:700; border:1px solid #A6F4C5;">Dibayar ke QR</span>`
+        : item.status === 'dibayar'
+        ? `<span class="badge badge--dibayar">RM${item.sumbangan} (FPX)</span>`
         : item.sumbangan > 0
         ? `<span class="badge badge--menunggu">RM${item.sumbangan} (Menunggu)</span>`
         : `<span class="badge" style="background:#F2F4F7; color:#475467;">Percuma</span>`;
@@ -618,9 +622,11 @@ const TAHFIZ_BRANCHES = [
 ];
 
 /**
- * Agihkan senarai doa kepada 4 cawangan tahfiz secara rawak dan sama rata
+ * Agihkan senarai doa kepada cawangan tahfiz secara rawak dan sama rata
  */
-function distributeRecordsToBranches(records) {
+function distributeRecordsToBranches(records, branchList = TAHFIZ_BRANCHES) {
+  const activeBranches = (branchList && branchList.length > 0) ? branchList : TAHFIZ_BRANCHES;
+
   // 1. Kocok secara rawak (Fisher-Yates Shuffle)
   const shuffled = [...records];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -628,16 +634,14 @@ function distributeRecordsToBranches(records) {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  // 2. Agihkan secara bergilir (round-robin) kepada 4 cawangan
-  const distribution = {
-    'Maahad Tahfiz Integrasi Al-Azhari Machang': [],
-    'Maahad Tahfiz An Nabawi Shah Alam': [],
-    'Maahad Tahfiz An Nabawi Jerantut': [],
-    'Maahad Tahfiz An Nabawi Langkawi': []
-  };
+  // 2. Agihkan secara bergilir (round-robin) kepada cawangan yang dipilih
+  const distribution = {};
+  activeBranches.forEach((branchName) => {
+    distribution[branchName] = [];
+  });
 
   shuffled.forEach((record, index) => {
-    const branchName = TAHFIZ_BRANCHES[index % TAHFIZ_BRANCHES.length];
+    const branchName = activeBranches[index % activeBranches.length];
     distribution[branchName].push({
       ...record,
       assignedBranch: branchName
@@ -777,8 +781,31 @@ exportCsvBtn?.addEventListener('click', async () => {
   await markRecordsAsDownloadedAndRead(recordsToExport);
 });
 
-// 7. MUAT TURUN PDF (A4 KEMAS — DIASINGKAN KEPADA 4 CAWANGAN TAHFIZ)
-exportPdfBtn?.addEventListener('click', async () => {
+// 7. MUAT TURUN PDF (A4 KEMAS — PILIHAN MENGIKUT CAWANGAN TAHFIZ)
+const pdfBranchModal = document.getElementById('pdfBranchModal');
+const closePdfBranchBtn = document.getElementById('closePdfBranchBtn');
+const cancelPdfBranchBtn = document.getElementById('cancelPdfBranchBtn');
+const confirmGeneratePdfBtn = document.getElementById('confirmGeneratePdfBtn');
+const toggleAllBranchesBtn = document.getElementById('toggleAllBranchesBtn');
+
+closePdfBranchBtn?.addEventListener('click', () => {
+  if (pdfBranchModal) pdfBranchModal.hidden = true;
+});
+
+cancelPdfBranchBtn?.addEventListener('click', () => {
+  if (pdfBranchModal) pdfBranchModal.hidden = true;
+});
+
+toggleAllBranchesBtn?.addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('input[name="pdfBranch"]');
+  const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+  checkboxes.forEach(cb => {
+    cb.checked = !allChecked;
+  });
+  toggleAllBranchesBtn.textContent = !allChecked ? 'Nyahpilih Semua' : 'Pilih Semua (4 Cawangan)';
+});
+
+exportPdfBtn?.addEventListener('click', () => {
   const filtered = getFilteredRecords();
   const recordsToExport = selectedIds.size > 0
     ? filtered.filter((r) => selectedIds.has(r.id))
@@ -789,8 +816,39 @@ exportPdfBtn?.addEventListener('click', async () => {
     return;
   }
 
-  // Agihkan doa secara rawak kepada 4 cawangan
-  const distributed = distributeRecordsToBranches(recordsToExport);
+  if (pdfBranchModal) {
+    pdfBranchModal.hidden = false;
+  }
+});
+
+confirmGeneratePdfBtn?.addEventListener('click', async () => {
+  const selectedBranches = Array.from(document.querySelectorAll('input[name="pdfBranch"]:checked'))
+    .map(cb => cb.value);
+
+  if (selectedBranches.length === 0) {
+    alert('Sila pilih sekurang-kurangnya satu cawangan untuk agihan senarai doa.');
+    return;
+  }
+
+  const filtered = getFilteredRecords();
+  const recordsToExport = selectedIds.size > 0
+    ? filtered.filter((r) => selectedIds.has(r.id))
+    : filtered;
+
+  if (!recordsToExport.length) {
+    alert('Tiada rekod untuk dimuat turun ke PDF.');
+    if (pdfBranchModal) pdfBranchModal.hidden = true;
+    return;
+  }
+
+  if (pdfBranchModal) pdfBranchModal.hidden = true;
+
+  await generatePdfForBranches(recordsToExport, selectedBranches);
+});
+
+async function generatePdfForBranches(recordsToExport, selectedBranches) {
+  // Agihkan doa secara rawak kepada cawangan yang dipilih sahaja
+  const distributed = distributeRecordsToBranches(recordsToExport, selectedBranches);
 
   // Cipta Dokumen PDF Saiz A4 Portrait (210mm x 297mm)
   const doc = new jsPDF({
@@ -815,7 +873,7 @@ exportPdfBtn?.addEventListener('click', async () => {
 
   let isFirstBranch = true;
 
-  TAHFIZ_BRANCHES.forEach((branchName) => {
+  selectedBranches.forEach((branchName) => {
     const branchItems = distributed[branchName] || [];
 
     // Setiap cawangan bermula di muka surat baharu supaya mudah dicetak dan diserahkan
@@ -926,11 +984,12 @@ exportPdfBtn?.addEventListener('click', async () => {
   });
 
   const dateFileStr = new Date().toISOString().slice(0, 10);
-  doc.save(`Halaqah-Bacaan-Doa-Tahlil-4-Cawangan-YAN-${dateFileStr}.pdf`);
+  const branchCountStr = selectedBranches.length === TAHFIZ_BRANCHES.length ? 'Semua-4-Cawangan' : `${selectedBranches.length}-Cawangan`;
+  doc.save(`Halaqah-Bacaan-Doa-Tahlil-${branchCountStr}-YAN-${dateFileStr}.pdf`);
 
   // Tanda selesai secara automatik bagi nama yang telah dimuat turun
   await markRecordsAsDownloadedAndRead(recordsToExport);
-});
+}
 
 // 8. Senarai Petugas (Email Management)
 function renderAllowedEmails() {
