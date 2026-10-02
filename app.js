@@ -954,12 +954,12 @@ function updateAudioUI(playing) {
     if (playIcon) playIcon.style.display = 'none';
     if (pauseIcon) pauseIcon.style.display = 'inline-block';
     if (equalizer) equalizer.classList.add('is-playing');
-    if (statusLabel) statusLabel.textContent = 'Dimainkan';
+    if (statusLabel) statusLabel.textContent = 'Play';
   } else {
     if (playIcon) playIcon.style.display = 'inline-block';
     if (pauseIcon) pauseIcon.style.display = 'none';
     if (equalizer) equalizer.classList.remove('is-playing');
-    if (statusLabel) statusLabel.textContent = 'Dijeda';
+    if (statusLabel) statusLabel.textContent = 'Pause';
   }
 }
 
