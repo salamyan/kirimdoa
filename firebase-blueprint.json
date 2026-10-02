@@ -59,6 +59,16 @@
           "type": "string",
           "description": "Sumber pautan web pengirim"
         },
+        "waktuDibaca": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Tarikh dan masa doa dibacakan oleh para huffaz"
+        },
+        "dimuatTurunPada": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Masa senarai doa dimuat turun oleh petugas"
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",

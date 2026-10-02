@@ -30,7 +30,9 @@ service cloud.firestore {
         request.auth.token.email.lower() == 'salam@yayasanannabawi.com' ||
         request.auth.token.email.lower() == 'admin@yayasanannabawi.com' ||
         request.auth.token.email.lower() == 'tahfiz@yayasanannabawi.com' ||
-        request.auth.token.email.lower() == 'yan.annabawi@gmail.com'
+        request.auth.token.email.lower() == 'yan.annabawi@gmail.com' ||
+        (exists(/databases/$(database)/documents/settings/allowedEmails) &&
+         request.auth.token.email.lower() in get(/databases/$(database)/documents/settings/allowedEmails).data.emails)
       );
     }
 
@@ -44,7 +46,7 @@ service cloud.firestore {
     // Validation helper for Kirim Doa payload
     function isValidKirimDoa(data) {
       return data.keys().hasAll(['pengirim', 'nama', 'jenisHajat', 'cawangan', 'sumbangan', 'status', 'dibaca'])
-        && data.keys().hasOnly(['pengirim', 'telefon', 'nama', 'jenisHajat', 'hajat', 'cawangan', 'sumbangan', 'status', 'dibaca', 'kaedah', 'sumber', 'createdAt'])
+        && data.keys().hasOnly(['pengirim', 'telefon', 'nama', 'jenisHajat', 'hajat', 'cawangan', 'sumbangan', 'status', 'dibaca', 'kaedah', 'sumber', 'createdAt', 'waktuDibaca', 'dimuatTurunPada'])
         && data.pengirim is string && data.pengirim.size() > 0 && data.pengirim.size() <= 80
         && data.nama is list && data.nama.size() >= 1 && data.nama.size() <= 3 && data.nama[0] is string
         && data.jenisHajat is string && data.jenisHajat.size() <= 100
@@ -67,7 +69,7 @@ service cloud.firestore {
 
       allow update: if (
         isAdmin()
-        && incoming().diff(existing()).affectedKeys().hasOnly(['dibaca', 'status', 'sumbangan', 'kaedah', 'catatanPetugas'])
+        && incoming().diff(existing()).affectedKeys().hasOnly(['dibaca', 'status', 'sumbangan', 'kaedah', 'catatanPetugas', 'waktuDibaca', 'dimuatTurunPada'])
         && incoming().dibaca is bool
       ) || (
         // Membenarkan pengesahan sumbangan oleh penderma awam (FPX / DuitNow QR)

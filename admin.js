@@ -21,7 +21,10 @@ import {
   onSnapshot, 
   orderBy, 
   query, 
-  updateDoc 
+  updateDoc,
+  getDoc,
+  setDoc,
+  serverTimestamp 
 } from 'firebase/firestore';
 
 const STORAGE_KEY = 'yan_kirim_doa_records';
@@ -122,6 +125,32 @@ function saveAllowedAdminEmails(list) {
 let allRecords = getStoredRecords();
 let selectedIds = new Set();
 let unsubscribeListener = null;
+let unsubscribeSettingsListener = null;
+
+// Melanggan kemas kini senarai emel admin dari Firestore secara masa-nyata
+function subscribeToAllowedEmails() {
+  if (unsubscribeSettingsListener) return;
+  try {
+    const docRef = doc(db, 'settings', 'allowedEmails');
+    unsubscribeSettingsListener = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (Array.isArray(data.emails) && data.emails.length > 0) {
+          const merged = Array.from(new Set([
+            ...DEFAULT_ALLOWED_ADMIN_EMAILS.map((e) => e.toLowerCase().trim()),
+            ...data.emails.map((e) => (e || '').toLowerCase().trim())
+          ]));
+          saveAllowedAdminEmails(merged);
+          renderAllowedEmails();
+        }
+      }
+    }, (err) => {
+      console.warn('Realtime settings listener warning:', err);
+    });
+  } catch (err) {
+    console.warn('Gagal melanggan settings/allowedEmails:', err);
+  }
+}
 
 // DOM Elements
 const authGate = document.getElementById('adminAuthGate');
@@ -159,11 +188,29 @@ const addEmailBtn = document.getElementById('addAdminEmailBtn');
 const allowedEmailsList = document.getElementById('allowedEmailsList');
 
 // 1. Auth Handling (Google / Email Login Only)
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const email = (user.email || '').toLowerCase();
-    const allowed = getAllowedAdminEmails().map((e) => e.toLowerCase());
-    const isAllowed = allowed.includes(email);
+    const email = (user.email || '').toLowerCase().trim();
+    let allowed = getAllowedAdminEmails().map((e) => e.toLowerCase().trim());
+    let isAllowed = allowed.includes(email);
+
+    // Jika belum dibenarkan dari cache setempat, semak terus dari Firestore settings/allowedEmails
+    if (!isAllowed) {
+      try {
+        const docSnap = await getDoc(doc(db, 'settings', 'allowedEmails'));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (Array.isArray(data.emails)) {
+            const firestoreEmails = data.emails.map((e) => (e || '').toLowerCase().trim());
+            allowed = Array.from(new Set([...allowed, ...firestoreEmails]));
+            saveAllowedAdminEmails(allowed);
+            isAllowed = allowed.includes(email);
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal membaca Firestore settings/allowedEmails:', err);
+      }
+    }
 
     if (isAllowed) {
       if (authGate) authGate.style.display = 'none';
@@ -172,6 +219,18 @@ onAuthStateChanged(auth, (user) => {
       if (userEmailEl) userEmailEl.textContent = email;
       if (authErrorMsg) authErrorMsg.style.display = 'none';
 
+      // Daftarkan/kemas kini rekod dalam admins/{uid} untuk pengesahan security rules
+      try {
+        await setDoc(doc(db, 'admins', user.uid), {
+          email: email,
+          role: 'admin',
+          lastLogin: serverTimestamp()
+        }, { merge: true });
+      } catch (err) {
+        console.warn('Gagal mendaftar admins/{uid}:', err);
+      }
+
+      subscribeToAllowedEmails();
       startRealtimeListener();
       renderDashboard();
     } else {
@@ -194,6 +253,10 @@ onAuthStateChanged(auth, (user) => {
     if (unsubscribeListener) {
       unsubscribeListener();
       unsubscribeListener = null;
+    }
+    if (unsubscribeSettingsListener) {
+      unsubscribeSettingsListener();
+      unsubscribeSettingsListener = null;
     }
   }
 });
@@ -619,6 +682,12 @@ async function markRecordsAsDownloadedAndRead(records) {
       waktuDibaca: nowIso,
       dimuatTurunPada: nowIso
     });
+    const target = allRecords.find((item) => item.id === r.id);
+    if (target) {
+      target.dibaca = true;
+      target.waktuDibaca = nowIso;
+      target.dimuatTurunPada = nowIso;
+    }
   });
 
   allRecords = getStoredRecords();
@@ -628,8 +697,9 @@ async function markRecordsAsDownloadedAndRead(records) {
   // Makluman visual
   showToastNotification(`✓ ${records.length} doa telah dimuat turun & ditandakan sebagai Selesai.`);
 
-  // 2. Kemas kini pangkalan data Firestore
+  // 2. Kemas kini pangkalan data Firestore secara kekal
   const updatePromises = records.map(async (r) => {
+    if (r.id.startsWith('seed-')) return;
     try {
       const docRef = doc(db, COLLECTION_NAME, r.id);
       await updateDoc(docRef, {
@@ -878,7 +948,7 @@ function renderAllowedEmails() {
   });
 
   allowedEmailsList.querySelectorAll('[data-remove-email]').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       const emailToRemove = e.currentTarget.dataset.removeEmail;
       const filtered = getAllowedAdminEmails().filter((item) => item.toLowerCase() !== emailToRemove.toLowerCase());
       if (filtered.length === 0) {
@@ -887,6 +957,17 @@ function renderAllowedEmails() {
       }
       saveAllowedAdminEmails(filtered);
       renderAllowedEmails();
+
+      // Kemas kini ke Firestore cloud secara masa-nyata
+      try {
+        await setDoc(doc(db, 'settings', 'allowedEmails'), {
+          emails: filtered,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        showToastNotification(`✓ E-mel (${emailToRemove}) telah dipadam dari pangkalan data cloud.`);
+      } catch (err) {
+        console.warn('Gagal kemas kini padam ke Firestore:', err);
+      }
     });
   });
 }
@@ -900,7 +981,7 @@ closeEmailModalBtn?.addEventListener('click', () => {
   if (emailModal) emailModal.hidden = true;
 });
 
-addEmailBtn?.addEventListener('click', () => {
+addEmailBtn?.addEventListener('click', async () => {
   const emailVal = (newEmailInput?.value || '').trim().toLowerCase();
   if (!emailVal || !emailVal.includes('@')) {
     alert('Sila masukkan format e-mel yang sah.');
@@ -912,6 +993,18 @@ addEmailBtn?.addEventListener('click', () => {
     saveAllowedAdminEmails(current);
     renderAllowedEmails();
     if (newEmailInput) newEmailInput.value = '';
+
+    // Simpan ke Firestore cloud secara automatik agar user boleh akses dari mana-mana peranti
+    try {
+      await setDoc(doc(db, 'settings', 'allowedEmails'), {
+        emails: current,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      showToastNotification(`✓ E-mel (${emailVal}) berjaya didaftarkan ke pangkalan data cloud.`);
+    } catch (err) {
+      console.warn('Gagal menyimpan ke Firestore settings/allowedEmails:', err);
+      showToastNotification(`E-mel disimpan secara setempat (Cloud sync: ${err.message})`);
+    }
   } else {
     alert('E-mel ini sudah berada dalam senarai.');
   }

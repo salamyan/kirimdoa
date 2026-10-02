@@ -1131,26 +1131,39 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
   color: #94A3B8;
 }
 
+.footer__admin-wrap {
+  margin-top: 4px;
+  position: relative;
+  z-index: 10;
+}
+
 .footer__admin-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
+  gap: 8px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #DBEAFE;
+  color: #FFFFFF;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 18px;
+  min-height: 44px;
   border-radius: 999px;
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 10;
+  touch-action: manipulation;
 }
 
-.footer__admin-pill:hover {
+.footer__admin-pill:hover,
+.footer__admin-pill:active {
   color: #FFFFFF;
   background: #2B45B0;
   border-color: #93C5FD;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(43, 69, 176, 0.45);
 }
 
 /* ---------- Modal & Admin ---------- */
@@ -1686,6 +1699,12 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
   right: 18px;
   z-index: 45;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.audio-widget__bar,
+.audio-mini-badge {
+  pointer-events: auto;
 }
 
 .audio-widget__bar {
@@ -2178,6 +2197,17 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
   .gallery { grid-template-columns: 1fr; gap: 14px; }
   .gallery-item { min-height: 220px; border-radius: var(--r-md); }
 
+  /* Extra bottom padding on mobile so footer and admin button scroll safely above fixed audio widget */
+  .footer__container {
+    padding-bottom: 130px !important;
+  }
+
+  .footer__admin-pill {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+
   /* Audio widget mobile */
   .audio-widget {
     bottom: 12px;
@@ -2185,12 +2215,14 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
     left: 10px;
     display: flex;
     justify-content: center;
+    pointer-events: none;
   }
   .audio-widget__bar {
     width: auto;
     max-width: 100%;
     gap: 6px;
     padding: 3px 8px 3px 3px;
+    pointer-events: auto;
   }
   .audio-widget__title {
     font-size: 11.5px;
