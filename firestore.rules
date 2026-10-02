@@ -65,9 +65,17 @@ service cloud.firestore {
 
       allow read: if isAdmin();
 
-      allow update: if isAdmin()
+      allow update: if (
+        isAdmin()
         && incoming().diff(existing()).affectedKeys().hasOnly(['dibaca', 'status', 'sumbangan', 'kaedah', 'catatanPetugas'])
-        && incoming().dibaca is bool;
+        && incoming().dibaca is bool
+      ) || (
+        // Membenarkan pengesahan sumbangan oleh penderma awam (FPX / DuitNow QR)
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'sumbangan', 'kaedah'])
+        && incoming().status in ['baru', 'menunggu', 'dibayar']
+        && incoming().sumbangan is number
+        && incoming().sumbangan >= 0
+      );
 
       allow delete: if isAdmin();
     }

@@ -36,8 +36,9 @@ function getStoredBillplzConfig() {
   } catch (e) {
     console.warn(e);
   }
+  const envUrl = import.meta.env?.VITE_BILLPLZ_URL;
   return {
-    paymentUrl: 'https://www.billplz.com/kirimdoa-yan?amount={amount}&billcode={id}',
+    paymentUrl: envUrl || 'https://www.billplz.com/kirimdoa-yan?amount={amount}&billcode={id}',
     collectionId: 'kirimdoa-yan'
   };
 }
@@ -440,6 +441,7 @@ if (form) {
       const id = await saveFn(data);
       state.lastSubmittedId = id;
       state.lastSubmittedPengirim = pengirim;
+      state.lastSubmittedTelefon = telefon;
       showSuccess(id, pengirim, nama, state.jenisHajat);
     } catch (err) {
       console.error(err);
@@ -816,6 +818,93 @@ function updateBillplzAmount(amt) {
 
   if (simAmountLabel) simAmountLabel.textContent = `RM${amt}`;
 }
+
+// Handle Direct Billplz FPX API Checkout when button clicked
+postBillplzBtn?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  const amt = postDonationAmount || 30;
+  const originalHtml = postBillplzBtn.innerHTML;
+  postBillplzBtn.style.pointerEvents = 'none';
+  postBillplzBtn.innerHTML = `Menghubungkan FPX... <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
+
+  try {
+    const res = await fetch('/api/billplz/create-bill', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: amt,
+        doaId: state.lastSubmittedId || ('doa-' + Date.now()),
+        pengirim: state.lastSubmittedPengirim || 'Hamba Allah',
+        telefon: state.lastSubmittedTelefon || ''
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.ok && data.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    if (data.error === 'BILLPLZ_NOT_CONFIGURED') {
+      // If API key is not configured in Vercel yet, prompt admin or fallback to Open Collection
+      const currentCfg = getStoredBillplzConfig();
+      if (currentCfg.paymentUrl && !currentCfg.paymentUrl.includes('kirimdoa-yan?')) {
+        const directUrl = currentCfg.paymentUrl.replace('{amount}', amt).replace('{id}', encodeURIComponent(state.lastSubmittedId || 'demo'));
+        window.location.href = directUrl;
+        return;
+      }
+
+      alert('Makluman Pentadbir:\n\nKunci BILLPLZ_API_KEY dan BILLPLZ_COLLECTION_ID belum dimasukkan di Vercel.\n\nSila tetapkan di Vercel Environment Variables untuk menggunakan FPX automatik, atau gunakan DuitNow QR.');
+      return;
+    }
+
+    alert('Ralat sistem Billplz: ' + (data.details || data.error || 'Sila cuba lagi sebentar.'));
+  } catch (err) {
+    console.warn('API billplz call error, falling back:', err);
+    const currentCfg = getStoredBillplzConfig();
+    const fallbackUrl = (currentCfg.paymentUrl || CONFIG.paymentUrl).replace('{amount}', amt).replace('{id}', encodeURIComponent(state.lastSubmittedId || 'demo'));
+    window.location.href = fallbackUrl;
+  } finally {
+    postBillplzBtn.style.pointerEvents = 'auto';
+    postBillplzBtn.innerHTML = originalHtml;
+  }
+});
+
+// Check Billplz Return Status on Page Load
+async function checkBillplzReturnStatus() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isReturn = urlParams.get('billplz_return') === '1' || urlParams.has('billplz[id]');
+  const isPaid = urlParams.get('billplz[paid]') === 'true' || urlParams.get('status') === 'completed' || urlParams.get('billplz_return') === '1';
+  const doaId = urlParams.get('doa_id');
+  const amount = Number(urlParams.get('amount')) || 30;
+
+  if (isReturn && isPaid) {
+    if (doaId && doaId !== 'general') {
+      try {
+        await updateRecordBoth(doaId, {
+          status: 'dibayar',
+          sumbangan: amount,
+          kaedah: 'Billplz FPX'
+        });
+      } catch (e) {
+        console.warn('Firestore update on return:', e);
+      }
+    }
+
+    if (heroSection) heroSection.classList.add('has-submitted');
+    if (form) form.hidden = true;
+    if (successEl) successEl.hidden = false;
+    if (paidReceiptNotice) {
+      paidReceiptNotice.hidden = false;
+      if (receiptText) {
+        receiptText.textContent = `Alhamdulillah, jazakumullahu khair! Sumbangan RM${amount} anda melalui Billplz FPX telah berjaya diterima & disahkan dalam sistem.`;
+      }
+    }
+    successEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+checkBillplzReturnStatus();
 
 // Payment simulation & confirm paid
 confirmSimPayBtn?.addEventListener('click', async () => {

@@ -492,9 +492,11 @@ function renderDashboard() {
       .map((n) => `<span class="tbl-name-item">${escapeHtml(n)}</span>`)
       .join('');
 
+    const methodHtml = item.kaedah ? `<div style="font-size:11px; color:#027A48; font-weight:600; margin-top:2px;">${escapeHtml(item.kaedah)}</div>` : '';
+
     const statusBadge =
       item.status === 'dibayar'
-        ? `<span class="badge badge--dibayar">RM${item.sumbangan} (Dibayar)</span>`
+        ? `<div><span class="badge badge--dibayar">RM${item.sumbangan} (Dibayar)</span>${methodHtml}</div>`
         : item.sumbangan > 0
         ? `<span class="badge badge--menunggu">RM${item.sumbangan} (Menunggu)</span>`
         : `<span class="badge" style="background:#F2F4F7; color:#475467;">Percuma</span>`;
