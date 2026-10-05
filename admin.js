@@ -1273,9 +1273,17 @@ const closeGaConfigBtn = document.getElementById('closeGaConfigBtn');
 const saveGaConfigBtn = document.getElementById('saveGaConfigBtn');
 const gaMeasurementIdInput = document.getElementById('gaMeasurementIdInput');
 
-adminGaConfigBtn?.addEventListener('click', () => {
+adminGaConfigBtn?.addEventListener('click', async () => {
   if (gaMeasurementIdInput) {
     gaMeasurementIdInput.value = localStorage.getItem('yan_ga_measurement_id') || '';
+    try {
+      const snap = await getDoc(doc(db, 'settings', 'analytics'));
+      if (snap.exists() && snap.data()?.measurementId) {
+        gaMeasurementIdInput.value = snap.data().measurementId;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
   }
   if (gaConfigModal) gaConfigModal.hidden = false;
 });
@@ -1284,13 +1292,29 @@ closeGaConfigBtn?.addEventListener('click', () => {
   if (gaConfigModal) gaConfigModal.hidden = true;
 });
 
-saveGaConfigBtn?.addEventListener('click', () => {
+saveGaConfigBtn?.addEventListener('click', async () => {
   const val = (gaMeasurementIdInput?.value || '').trim();
   if (val) {
     localStorage.setItem('yan_ga_measurement_id', val);
-    alert(`Google Analytics Measurement ID (${val}) berjaya disimpan!`);
+    try {
+      await setDoc(doc(db, 'settings', 'analytics'), {
+        measurementId: val,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Gagal menyimpan analytics ke Firestore:', e);
+    }
+    alert(`Google Analytics Measurement ID (${val}) berjaya disimpan secara kekal!`);
   } else {
     localStorage.removeItem('yan_ga_measurement_id');
+    try {
+      await setDoc(doc(db, 'settings', 'analytics'), {
+        measurementId: '',
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } catch (e) {
+      console.warn(e);
+    }
     alert('Tetapan Google Analytics telah ditetapkan semula ke nilai lalai.');
   }
   if (gaConfigModal) gaConfigModal.hidden = true;
