@@ -403,41 +403,35 @@ function startRealtimeListener() {
   }
 }
 
-// 3. Helper: Date Filter matching
+// 3. Helper: Date Filter matching (Hanya Semua, Hari Ini, dan Pilih Range Tarikh)
 function matchesDateFilter(recordDateIso, preset, fromVal, toVal) {
   if (!recordDateIso) return true;
+  if (preset === 'semua') return true;
+
   const itemDate = new Date(recordDateIso);
   const now = new Date();
 
+  // Helper untuk mendapatkan format YYYY-MM-DD waktu tempatan
+  const getLocalDateStr = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const itemDateStr = getLocalDateStr(itemDate);
+  const todayStr = getLocalDateStr(now);
+
   if (preset === 'hari-ini') {
-    return itemDate.toDateString() === now.toDateString();
+    return itemDateStr === todayStr;
   }
-  if (preset === 'isnin-khamis') {
-    const day = itemDate.getDay();
-    const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24);
-    return (day === 1 || day === 4) && diffDays <= 7;
-  }
-  if (preset === '7-hari') {
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
-    return itemDate >= sevenDaysAgo;
-  }
-  if (preset === '30-hari') {
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
-    return itemDate >= thirtyDaysAgo;
-  }
+
   if (preset === 'custom') {
-    if (fromVal) {
-      const fromDate = new Date(fromVal);
-      fromDate.setHours(0, 0, 0, 0);
-      if (itemDate < fromDate) return false;
-    }
-    if (toVal) {
-      const toDate = new Date(toVal);
-      toDate.setHours(23, 59, 59, 999);
-      if (itemDate > toDate) return false;
-    }
+    if (fromVal && itemDateStr < fromVal) return false;
+    if (toVal && itemDateStr > toVal) return false;
     return true;
   }
+
   return true;
 }
 
@@ -665,19 +659,7 @@ function updateSelectedCountUI(filteredList) {
   const count = selectedIds.size;
   if (selectedCountBadge) {
     if (count > 0) {
-      // Semak jika ada rekod selesai yang dipilih secara manual
-      const selesaiCount = Array.from(selectedIds).filter((id) => {
-        const item = allRecords.find((r) => r.id === id);
-        return item && item.dibaca;
-      }).length;
-
-      if (selesaiCount > 0 && count > selesaiCount) {
-        selectedCountBadge.textContent = `${count} doa dipilih (${count - selesaiCount} baharu, ${selesaiCount} selesai)`;
-      } else if (selesaiCount > 0 && count === selesaiCount) {
-        selectedCountBadge.textContent = `${count} doa dipilih (Semua berstatus selesai)`;
-      } else {
-        selectedCountBadge.textContent = `${count} doa baharu dipilih`;
-      }
+      selectedCountBadge.textContent = `${count} doa dipilih`;
       selectedCountBadge.hidden = false;
     } else {
       selectedCountBadge.textContent = `Semua (${filteredList.length}) rekod dipaparkan`;
@@ -697,15 +679,10 @@ function updateSelectedCountUI(filteredList) {
   }
 
   if (selectAllCheckbox) {
-    const unreadList = filteredList.filter((r) => !r.dibaca);
-    const selectedInFiltered = filteredList.filter((r) => selectedIds.has(r.id));
-
-    if (unreadList.length > 0 && unreadList.every((r) => selectedIds.has(r.id))) {
-      // Semua doa baharu (belum selesai) telah terpilih
+    if (filteredList.length > 0 && filteredList.every((r) => selectedIds.has(r.id))) {
       selectAllCheckbox.checked = true;
       selectAllCheckbox.indeterminate = false;
-    } else if (selectedInFiltered.length > 0) {
-      // Sebahagian dipilih (sama ada sebahagian doa baharu atau doa selesai yang dipilih manual)
+    } else if (count > 0) {
       selectAllCheckbox.checked = false;
       selectAllCheckbox.indeterminate = true;
     } else {
@@ -740,20 +717,12 @@ bulkDeleteBtn?.addEventListener('click', async () => {
   renderDashboard();
 });
 
-// Select all toggle: Kecualikan status 'Selesai' secara automatik bagi memudahkan muat turun senarai baharu
+// Select all toggle
 selectAllCheckbox?.addEventListener('change', (e) => {
   const filtered = getFilteredRecords();
   if (e.target.checked) {
-    const unreadRecords = filtered.filter((r) => !r.dibaca);
-    if (unreadRecords.length > 0) {
-      unreadRecords.forEach((r) => selectedIds.add(r.id));
-      showToastNotification(`✓ ${unreadRecords.length} doa baharu (Belum Selesai) dipilih secara automatik. Rekod 'Selesai' dikecualikan.`);
-    } else {
-      showToastNotification('Tiada rekod berstatus Belum Selesai dalam senarai ini. Sila tandakan kotak secara manual bagi rekod selesai.');
-      e.target.checked = false;
-    }
+    filtered.forEach((r) => selectedIds.add(r.id));
   } else {
-    // Nyahpilih semua rekod dalam paparan semasa
     filtered.forEach((r) => selectedIds.delete(r.id));
   }
   renderDashboard();
@@ -761,14 +730,63 @@ selectAllCheckbox?.addEventListener('change', (e) => {
 
 // Filter change listeners
 statusFilter?.addEventListener('change', renderDashboard);
-dateFilter?.addEventListener('change', () => {
-  const val = dateFilter.value;
+
+const resetDateRangeBtn = document.getElementById('resetDateRangeBtn');
+const dateChips = document.querySelectorAll('[data-date-chip]');
+
+function updateDateFilterUI(val) {
   const customBox = document.getElementById('customDateRangeWrap');
   if (customBox) {
-    customBox.hidden = val !== 'custom';
+    customBox.style.display = val === 'custom' ? 'flex' : 'none';
+  }
+  dateChips.forEach((chip) => {
+    if (chip.dataset.dateChip === val) {
+      chip.classList.add('active');
+    } else {
+      chip.classList.remove('active');
+    }
+  });
+}
+
+dateFilter?.addEventListener('change', () => {
+  const val = dateFilter.value;
+  updateDateFilterUI(val);
+  if (val === 'custom') {
+    if (dateFromInput && !dateFromInput.value) {
+      const today = new Date().toISOString().slice(0, 10);
+      dateFromInput.value = today;
+      if (dateToInput) dateToInput.value = today;
+    }
   }
   renderDashboard();
 });
+
+dateChips.forEach((chip) => {
+  chip.addEventListener('click', () => {
+    const preset = chip.dataset.dateChip;
+    if (dateFilter) {
+      dateFilter.value = preset;
+    }
+    updateDateFilterUI(preset);
+    if (preset === 'custom') {
+      if (dateFromInput && !dateFromInput.value) {
+        const today = new Date().toISOString().slice(0, 10);
+        dateFromInput.value = today;
+        if (dateToInput) dateToInput.value = today;
+      }
+    }
+    renderDashboard();
+  });
+});
+
+resetDateRangeBtn?.addEventListener('click', () => {
+  if (dateFromInput) dateFromInput.value = '';
+  if (dateToInput) dateToInput.value = '';
+  if (dateFilter) dateFilter.value = 'semua';
+  updateDateFilterUI('semua');
+  renderDashboard();
+});
+
 dateFromInput?.addEventListener('change', renderDashboard);
 dateToInput?.addEventListener('change', renderDashboard);
 searchInput?.addEventListener('input', renderDashboard);
@@ -882,10 +900,9 @@ async function markRecordsAsDownloadedAndRead(records) {
 // 6. MUAT TURUN CSV (DENGAN AGIHAN 4 CAWANGAN TAHFIZ)
 exportCsvBtn?.addEventListener('click', async () => {
   const filtered = getFilteredRecords();
-  const unreadInFiltered = filtered.filter((r) => !r.dibaca);
   const recordsToExport = selectedIds.size > 0
     ? filtered.filter((r) => selectedIds.has(r.id))
-    : (unreadInFiltered.length > 0 ? unreadInFiltered : filtered);
+    : filtered;
 
   if (!recordsToExport.length) {
     alert('Tiada rekod untuk dimuat turun ke CSV.');
@@ -992,10 +1009,9 @@ confirmGeneratePdfBtn?.addEventListener('click', async () => {
   }
 
   const filtered = getFilteredRecords();
-  const unreadInFiltered = filtered.filter((r) => !r.dibaca);
   const recordsToExport = selectedIds.size > 0
     ? filtered.filter((r) => selectedIds.has(r.id))
-    : (unreadInFiltered.length > 0 ? unreadInFiltered : filtered);
+    : filtered;
 
   if (!recordsToExport.length) {
     alert('Tiada rekod untuk dimuat turun ke PDF.');

@@ -163,21 +163,29 @@
           <!-- Date Submission Filter -->
           <div class="filter-group">
             <label for="adminDateFilter" class="filter-lbl">Tarikh Submission:</label>
-            <select id="adminDateFilter" class="admin-select">
-              <option value="semua">Semua Tarikh</option>
+            <select id="adminDateFilter" class="admin-select" style="font-weight:600;">
+              <option value="semua">Semua</option>
               <option value="hari-ini">Hari Ini</option>
-              <option value="isnin-khamis">Isnin &amp; Khamis Terkini (Halaqah)</option>
-              <option value="7-hari">7 Hari Lepas</option>
-              <option value="30-hari">30 Hari Lepas</option>
-              <option value="custom">Pilihan Tarikh (Dari - Hingga)</option>
+              <option value="custom">Pilih Range Tarikh</option>
             </select>
           </div>
 
-          <!-- Custom Date Range picker (hidden unless 'custom' selected) -->
-          <div id="customDateRangeWrap" class="filter-group filter-group--custom-date" hidden>
-            <input type="date" id="adminDateFrom" class="admin-date-input" title="Tarikh Mula" aria-label="Tarikh Mula">
-            <span style="font-size:12px; color:var(--muted);">hingga</span>
-            <input type="date" id="adminDateTo" class="admin-date-input" title="Tarikh Akhir" aria-label="Tarikh Akhir">
+          <!-- Quick Date Shortcut Chips -->
+          <div class="filter-group filter-group--chips">
+            <button type="button" class="date-chip-btn active" data-date-chip="semua">Semua</button>
+            <button type="button" class="date-chip-btn" data-date-chip="hari-ini">Hari Ini</button>
+            <button type="button" class="date-chip-btn" data-date-chip="custom">Pilih Range Tarikh</button>
+          </div>
+
+          <!-- Custom Date Range picker (shown when 'custom' selected or Range clicked) -->
+          <div id="customDateRangeWrap" class="filter-group filter-group--custom-date" style="display:none;">
+            <div class="date-range-box">
+              <span class="range-tag">Dari:</span>
+              <input type="date" id="adminDateFrom" class="admin-date-input" style="min-height:30px; padding:2px 8px; font-size:12.5px;" title="Tarikh Mula" aria-label="Tarikh Mula">
+              <span class="range-tag">Hingga:</span>
+              <input type="date" id="adminDateTo" class="admin-date-input" style="min-height:30px; padding:2px 8px; font-size:12.5px;" title="Tarikh Akhir" aria-label="Tarikh Akhir">
+              <button type="button" id="resetDateRangeBtn" class="btn-clear-date" title="Set Semula Tarikh">&times; Reset</button>
+            </div>
           </div>
 
           <div class="filter-group filter-group--search">
@@ -191,7 +199,7 @@
             <thead>
               <tr>
                 <th style="width:36px; text-align:center;">
-                  <input type="checkbox" id="selectAllRows" title="Pilih Semua Doa Baharu (Kecualikan yang Selesai)" aria-label="Pilih Semua Doa Baharu">
+                  <input type="checkbox" id="selectAllRows" title="Pilih Semua / Batal Semua" aria-label="Pilih Semua">
                 </th>
                 <th style="width:40px; text-align:center;">No</th>
                 <th style="width:160px;">Tarikh Submission</th>

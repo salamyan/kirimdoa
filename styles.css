@@ -1588,6 +1588,64 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
 .admin-search-input {
   width: 100%;
 }
+.filter-group--chips {
+  display: flex;
+  gap: 4px;
+}
+.date-chip-btn {
+  background: #FFF;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.date-chip-btn:hover {
+  background: #F4F1EA;
+  border-color: #C8C2B4;
+  color: var(--ink);
+}
+.date-chip-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #FFF;
+  font-weight: 600;
+}
+.date-range-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFF;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1.5px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.range-tag {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.btn-clear-date {
+  background: #F2F4F7;
+  border: 1px solid #D0D5DD;
+  color: #475467;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-clear-date:hover {
+  background: #E4E7EC;
+  color: #1D2939;
+}
 .admin-table-container {
   overflow-x: auto;
   border: 1px solid var(--line);
