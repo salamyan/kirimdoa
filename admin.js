@@ -105,7 +105,13 @@ function getAllowedAdminEmails() {
     const raw = localStorage.getItem(ADMIN_EMAILS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Tapis keluar emel lalai lama seperti admin@yayasanannabawi.com
+        const cleaned = parsed
+          .map((e) => (e || '').toLowerCase().trim())
+          .filter((e) => e && e !== 'admin@yayasanannabawi.com');
+        return cleaned.length > 0 ? cleaned : DEFAULT_ALLOWED_ADMIN_EMAILS;
+      }
     }
   } catch (e) {
     console.warn(e);
@@ -115,7 +121,10 @@ function getAllowedAdminEmails() {
 
 function saveAllowedAdminEmails(list) {
   try {
-    localStorage.setItem(ADMIN_EMAILS_STORAGE_KEY, JSON.stringify(list));
+    const cleanList = (list || [])
+      .map((e) => (e || '').toLowerCase().trim())
+      .filter((e) => e && e !== 'admin@yayasanannabawi.com');
+    localStorage.setItem(ADMIN_EMAILS_STORAGE_KEY, JSON.stringify(cleanList));
   } catch (e) {
     console.warn(e);
   }
@@ -135,12 +144,12 @@ function subscribeToAllowedEmails() {
     unsubscribeSettingsListener = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (Array.isArray(data.emails) && data.emails.length > 0) {
-          const merged = Array.from(new Set([
-            ...DEFAULT_ALLOWED_ADMIN_EMAILS.map((e) => e.toLowerCase().trim()),
-            ...data.emails.map((e) => (e || '').toLowerCase().trim())
-          ]));
-          saveAllowedAdminEmails(merged);
+        if (Array.isArray(data.emails)) {
+          // Firestore adalah sumber kebenaran (source of truth) mutlak — jangan merge semula default emails!
+          const firestoreEmails = data.emails
+            .map((e) => (e || '').toLowerCase().trim())
+            .filter((e) => e && e !== 'admin@yayasanannabawi.com');
+          saveAllowedAdminEmails(firestoreEmails.length > 0 ? firestoreEmails : ['salam@yayasanannabawi.com']);
           renderAllowedEmails();
         }
       }
@@ -194,22 +203,40 @@ onAuthStateChanged(auth, async (user) => {
     let allowed = getAllowedAdminEmails().map((e) => e.toLowerCase().trim());
     let isAllowed = allowed.includes(email);
 
-    // Jika belum dibenarkan dari cache setempat, semak terus dari Firestore settings/allowedEmails
-    if (!isAllowed) {
-      try {
-        const docSnap = await getDoc(doc(db, 'settings', 'allowedEmails'));
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (Array.isArray(data.emails)) {
-            const firestoreEmails = data.emails.map((e) => (e || '').toLowerCase().trim());
-            allowed = Array.from(new Set([...allowed, ...firestoreEmails]));
-            saveAllowedAdminEmails(allowed);
-            isAllowed = allowed.includes(email);
+    // Ambil senarai terkini dari Firestore settings/allowedEmails
+    try {
+      const docSnap = await getDoc(doc(db, 'settings', 'allowedEmails'));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (Array.isArray(data.emails)) {
+          let firestoreEmails = data.emails
+            .map((e) => (e || '').toLowerCase().trim())
+            .filter((e) => e && e !== 'admin@yayasanannabawi.com');
+
+          if (firestoreEmails.length === 0) {
+            firestoreEmails = ['salam@yayasanannabawi.com'];
           }
+
+          // Jika dalam Firestore masih ada admin@yayasanannabawi.com, padamkan serta-merta
+          if (data.emails.some((e) => (e || '').toLowerCase().trim() === 'admin@yayasanannabawi.com')) {
+            setDoc(doc(db, 'settings', 'allowedEmails'), {
+              emails: firestoreEmails,
+              updatedAt: serverTimestamp()
+            }).catch(console.warn);
+          }
+
+          saveAllowedAdminEmails(firestoreEmails);
+          allowed = firestoreEmails;
+          isAllowed = allowed.includes(email);
         }
-      } catch (err) {
-        console.warn('Gagal membaca Firestore settings/allowedEmails:', err);
+      } else {
+        await setDoc(doc(db, 'settings', 'allowedEmails'), {
+          emails: ['salam@yayasanannabawi.com'],
+          updatedAt: serverTimestamp()
+        });
       }
+    } catch (err) {
+      console.warn('Gagal membaca Firestore settings/allowedEmails:', err);
     }
 
     if (isAllowed) {
@@ -1008,8 +1035,9 @@ function renderAllowedEmails() {
 
   allowedEmailsList.querySelectorAll('[data-remove-email]').forEach((btn) => {
     btn.addEventListener('click', async (e) => {
-      const emailToRemove = e.currentTarget.dataset.removeEmail;
-      const filtered = getAllowedAdminEmails().filter((item) => item.toLowerCase() !== emailToRemove.toLowerCase());
+      const emailToRemove = (e.currentTarget.dataset.removeEmail || '').toLowerCase().trim();
+      const currentList = getAllowedAdminEmails();
+      const filtered = currentList.filter((item) => item.toLowerCase().trim() !== emailToRemove);
       if (filtered.length === 0) {
         alert('Sekurang-kurangnya satu e-mel admin mesti dikekalkan.');
         return;
@@ -1017,15 +1045,16 @@ function renderAllowedEmails() {
       saveAllowedAdminEmails(filtered);
       renderAllowedEmails();
 
-      // Kemas kini ke Firestore cloud secara masa-nyata
+      // Kemas kini ke Firestore cloud secara mutlak (tanpa merge semula)
       try {
         await setDoc(doc(db, 'settings', 'allowedEmails'), {
           emails: filtered,
           updatedAt: serverTimestamp()
-        }, { merge: true });
+        });
         showToastNotification(`✓ E-mel (${emailToRemove}) telah dipadam dari pangkalan data cloud.`);
       } catch (err) {
         console.warn('Gagal kemas kini padam ke Firestore:', err);
+        showToastNotification(`Amaran: Gagal simpan ke Cloud (${err.message})`);
       }
     });
   });
@@ -1058,7 +1087,7 @@ addEmailBtn?.addEventListener('click', async () => {
       await setDoc(doc(db, 'settings', 'allowedEmails'), {
         emails: current,
         updatedAt: serverTimestamp()
-      }, { merge: true });
+      });
       showToastNotification(`✓ E-mel (${emailVal}) berjaya didaftarkan ke pangkalan data cloud.`);
     } catch (err) {
       console.warn('Gagal menyimpan ke Firestore settings/allowedEmails:', err);

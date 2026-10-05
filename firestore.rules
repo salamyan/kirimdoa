@@ -28,9 +28,6 @@ service cloud.firestore {
     function isAllowedEmail() {
       return isSignedIn() && (
         request.auth.token.email.lower() == 'salam@yayasanannabawi.com' ||
-        request.auth.token.email.lower() == 'admin@yayasanannabawi.com' ||
-        request.auth.token.email.lower() == 'tahfiz@yayasanannabawi.com' ||
-        request.auth.token.email.lower() == 'yan.annabawi@gmail.com' ||
         (exists(/databases/$(database)/documents/settings/allowedEmails) &&
          request.auth.token.email.lower() in get(/databases/$(database)/documents/settings/allowedEmails).data.emails)
       );

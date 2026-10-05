@@ -2244,8 +2244,8 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
   }
 
   .footer__admin-pill {
-    width: 100%;
-    max-width: 280px;
+    width: auto;
+    min-width: 96px;
     justify-content: center;
   }
 

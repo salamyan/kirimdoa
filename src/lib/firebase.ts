@@ -37,12 +37,9 @@ export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Allowed admin emails list
+// Allowed admin emails list (hanya emel rasmi sebenar yang disahkan)
 export const DEFAULT_ALLOWED_ADMIN_EMAILS = [
-  'salam@yayasanannabawi.com',
-  'admin@yayasanannabawi.com',
-  'tahfiz@yayasanannabawi.com',
-  'yan.annabawi@gmail.com'
+  'salam@yayasanannabawi.com'
 ];
 
 // Error handling helper conforming to FirestoreErrorInfo
