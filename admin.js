@@ -665,7 +665,19 @@ function updateSelectedCountUI(filteredList) {
   const count = selectedIds.size;
   if (selectedCountBadge) {
     if (count > 0) {
-      selectedCountBadge.textContent = `${count} doa dipilih`;
+      // Semak jika ada rekod selesai yang dipilih secara manual
+      const selesaiCount = Array.from(selectedIds).filter((id) => {
+        const item = allRecords.find((r) => r.id === id);
+        return item && item.dibaca;
+      }).length;
+
+      if (selesaiCount > 0 && count > selesaiCount) {
+        selectedCountBadge.textContent = `${count} doa dipilih (${count - selesaiCount} baharu, ${selesaiCount} selesai)`;
+      } else if (selesaiCount > 0 && count === selesaiCount) {
+        selectedCountBadge.textContent = `${count} doa dipilih (Semua berstatus selesai)`;
+      } else {
+        selectedCountBadge.textContent = `${count} doa baharu dipilih`;
+      }
       selectedCountBadge.hidden = false;
     } else {
       selectedCountBadge.textContent = `Semua (${filteredList.length}) rekod dipaparkan`;
@@ -685,10 +697,15 @@ function updateSelectedCountUI(filteredList) {
   }
 
   if (selectAllCheckbox) {
-    if (filteredList.length > 0 && filteredList.every((r) => selectedIds.has(r.id))) {
+    const unreadList = filteredList.filter((r) => !r.dibaca);
+    const selectedInFiltered = filteredList.filter((r) => selectedIds.has(r.id));
+
+    if (unreadList.length > 0 && unreadList.every((r) => selectedIds.has(r.id))) {
+      // Semua doa baharu (belum selesai) telah terpilih
       selectAllCheckbox.checked = true;
       selectAllCheckbox.indeterminate = false;
-    } else if (count > 0) {
+    } else if (selectedInFiltered.length > 0) {
+      // Sebahagian dipilih (sama ada sebahagian doa baharu atau doa selesai yang dipilih manual)
       selectAllCheckbox.checked = false;
       selectAllCheckbox.indeterminate = true;
     } else {
@@ -723,12 +740,20 @@ bulkDeleteBtn?.addEventListener('click', async () => {
   renderDashboard();
 });
 
-// Select all toggle
+// Select all toggle: Kecualikan status 'Selesai' secara automatik bagi memudahkan muat turun senarai baharu
 selectAllCheckbox?.addEventListener('change', (e) => {
   const filtered = getFilteredRecords();
   if (e.target.checked) {
-    filtered.forEach((r) => selectedIds.add(r.id));
+    const unreadRecords = filtered.filter((r) => !r.dibaca);
+    if (unreadRecords.length > 0) {
+      unreadRecords.forEach((r) => selectedIds.add(r.id));
+      showToastNotification(`✓ ${unreadRecords.length} doa baharu (Belum Selesai) dipilih secara automatik. Rekod 'Selesai' dikecualikan.`);
+    } else {
+      showToastNotification('Tiada rekod berstatus Belum Selesai dalam senarai ini. Sila tandakan kotak secara manual bagi rekod selesai.');
+      e.target.checked = false;
+    }
   } else {
+    // Nyahpilih semua rekod dalam paparan semasa
     filtered.forEach((r) => selectedIds.delete(r.id));
   }
   renderDashboard();
@@ -857,9 +882,10 @@ async function markRecordsAsDownloadedAndRead(records) {
 // 6. MUAT TURUN CSV (DENGAN AGIHAN 4 CAWANGAN TAHFIZ)
 exportCsvBtn?.addEventListener('click', async () => {
   const filtered = getFilteredRecords();
+  const unreadInFiltered = filtered.filter((r) => !r.dibaca);
   const recordsToExport = selectedIds.size > 0
     ? filtered.filter((r) => selectedIds.has(r.id))
-    : filtered;
+    : (unreadInFiltered.length > 0 ? unreadInFiltered : filtered);
 
   if (!recordsToExport.length) {
     alert('Tiada rekod untuk dimuat turun ke CSV.');
@@ -966,9 +992,10 @@ confirmGeneratePdfBtn?.addEventListener('click', async () => {
   }
 
   const filtered = getFilteredRecords();
+  const unreadInFiltered = filtered.filter((r) => !r.dibaca);
   const recordsToExport = selectedIds.size > 0
     ? filtered.filter((r) => selectedIds.has(r.id))
-    : filtered;
+    : (unreadInFiltered.length > 0 ? unreadInFiltered : filtered);
 
   if (!recordsToExport.length) {
     alert('Tiada rekod untuk dimuat turun ke PDF.');
