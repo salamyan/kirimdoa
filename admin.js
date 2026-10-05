@@ -110,20 +110,26 @@ function getAllowedAdminEmails() {
         const cleaned = parsed
           .map((e) => (e || '').toLowerCase().trim())
           .filter((e) => e && e !== 'admin@yayasanannabawi.com');
-        return cleaned.length > 0 ? cleaned : DEFAULT_ALLOWED_ADMIN_EMAILS;
+        if (!cleaned.includes('salam@yayasanannabawi.com')) {
+          cleaned.unshift('salam@yayasanannabawi.com');
+        }
+        return cleaned;
       }
     }
   } catch (e) {
     console.warn(e);
   }
-  return DEFAULT_ALLOWED_ADMIN_EMAILS;
+  return ['salam@yayasanannabawi.com'];
 }
 
 function saveAllowedAdminEmails(list) {
   try {
-    const cleanList = (list || [])
+    let cleanList = (list || [])
       .map((e) => (e || '').toLowerCase().trim())
       .filter((e) => e && e !== 'admin@yayasanannabawi.com');
+    if (!cleanList.includes('salam@yayasanannabawi.com')) {
+      cleanList.unshift('salam@yayasanannabawi.com');
+    }
     localStorage.setItem(ADMIN_EMAILS_STORAGE_KEY, JSON.stringify(cleanList));
   } catch (e) {
     console.warn(e);
@@ -145,11 +151,13 @@ function subscribeToAllowedEmails() {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (Array.isArray(data.emails)) {
-          // Firestore adalah sumber kebenaran (source of truth) mutlak — jangan merge semula default emails!
-          const firestoreEmails = data.emails
+          let firestoreEmails = data.emails
             .map((e) => (e || '').toLowerCase().trim())
             .filter((e) => e && e !== 'admin@yayasanannabawi.com');
-          saveAllowedAdminEmails(firestoreEmails.length > 0 ? firestoreEmails : ['salam@yayasanannabawi.com']);
+          if (!firestoreEmails.includes('salam@yayasanannabawi.com')) {
+            firestoreEmails.unshift('salam@yayasanannabawi.com');
+          }
+          saveAllowedAdminEmails(firestoreEmails);
           renderAllowedEmails();
         }
       }
@@ -1024,11 +1032,18 @@ function renderAllowedEmails() {
   const emails = getAllowedAdminEmails();
   allowedEmailsList.innerHTML = '';
   emails.forEach((em) => {
+    const isPrimary = em.toLowerCase().trim() === 'salam@yayasanannabawi.com';
     const div = document.createElement('div');
     div.className = 'email-row-item';
     div.innerHTML = `
-      <span>${escapeHtml(em)}</span>
-      <button type="button" data-remove-email="${escapeHtml(em)}" title="Padam e-mel">&times; Padam</button>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-weight:${isPrimary ? '700' : '500'}; color:var(--ink);">${escapeHtml(em)}</span>
+        ${isPrimary ? '<span class="badge" style="background:#ECFDF3; color:#027A48; font-size:11px; padding:2px 8px; border-radius:999px; font-weight:700;">Petugas Utama</span>' : ''}
+      </div>
+      ${isPrimary 
+        ? '<span style="font-size:11.5px; color:var(--muted); font-style:italic;">(Kekal)</span>'
+        : `<button type="button" data-remove-email="${escapeHtml(em)}" title="Padam e-mel">&times; Padam</button>`
+      }
     `;
     allowedEmailsList.appendChild(div);
   });
