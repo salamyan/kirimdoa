@@ -22,6 +22,7 @@ import {
   orderBy, 
   query, 
   updateDoc,
+  deleteDoc,
   getDoc,
   setDoc,
   serverTimestamp 
@@ -98,6 +99,31 @@ function updateRecordInStorage(id, partial) {
     console.error('Gagal menyimpan rekod:', err);
   }
   return updated;
+}
+
+function deleteRecordsFromStorage(idsToDelete) {
+  const idSet = new Set(idsToDelete);
+  const current = getStoredRecords();
+  const updated = current.filter((item) => !idSet.has(item.id));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.error('Gagal menyimpan rekod selepas padam:', err);
+  }
+  return updated;
+}
+
+async function deleteRecordsFromFirestore(idsToDelete) {
+  const promises = idsToDelete.map(async (id) => {
+    if (id.startsWith('seed-')) return;
+    try {
+      const docRef = doc(db, COLLECTION_NAME, id);
+      await deleteDoc(docRef);
+    } catch (err) {
+      console.warn('Gagal memadam dari Firestore:', id, err);
+    }
+  });
+  await Promise.allSettled(promises);
 }
 
 function getAllowedAdminEmails() {
@@ -191,6 +217,8 @@ const searchInput = document.getElementById('adminSearchInput');
 
 const selectAllCheckbox = document.getElementById('selectAllRows');
 const selectedCountBadge = document.getElementById('selectedCountBadge');
+const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+const bulkDeleteBtnText = document.getElementById('bulkDeleteBtnText');
 const tableBody = document.getElementById('adminTableBody');
 
 const exportCsvBtn = document.getElementById('exportCsvBtn');
@@ -513,7 +541,7 @@ function renderDashboard() {
   if (filtered.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align:center; padding:48px 16px; color:var(--muted);">
+        <td colspan="10" style="text-align:center; padding:48px 16px; color:var(--muted);">
           <div style="font-size:15px; font-weight:600; margin-bottom:4px;">Tiada Rekod Dijumpai</div>
           <div style="font-size:13px;">Sila ubah pilihan tapisan tarikh, status atau carian anda di atas.</div>
         </td>
@@ -572,6 +600,11 @@ function renderDashboard() {
           ${item.dibaca ? '✓ Selesai' : 'Belum Selesai'}
         </button>
       </td>
+      <td style="text-align:center;">
+        <button type="button" class="row-delete-btn" data-delete-row="${item.id}" title="Padam rekod ${escapeHtml(item.pengirim || '')}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+        </button>
+      </td>
     `;
     tableBody.appendChild(tr);
   });
@@ -607,6 +640,25 @@ function renderDashboard() {
       }
     });
   });
+
+  tableBody.querySelectorAll('[data-delete-row]').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const id = e.currentTarget.dataset.deleteRow;
+      const target = allRecords.find((r) => r.id === id);
+      const name = target ? (target.pengirim || 'rekod ini') : 'rekod ini';
+      const confirmed = confirm(`Adakah anda pasti ingin memadam rekod kiriman doa (${name}) secara kekal? Tindakan ini tidak boleh dikembalikan.`);
+      if (!confirmed) return;
+
+      selectedIds.delete(id);
+      allRecords = deleteRecordsFromStorage([id]);
+      renderDashboard();
+
+      showToastNotification(`Sedang memadam rekod (${name})...`);
+      await deleteRecordsFromFirestore([id]);
+      showToastNotification(`✓ Rekod doa (${name}) telah berjaya dipadam.`);
+      renderDashboard();
+    });
+  });
 }
 
 function updateSelectedCountUI(filteredList) {
@@ -618,6 +670,17 @@ function updateSelectedCountUI(filteredList) {
     } else {
       selectedCountBadge.textContent = `Semua (${filteredList.length}) rekod dipaparkan`;
       selectedCountBadge.hidden = false;
+    }
+  }
+
+  if (bulkDeleteBtn) {
+    if (count > 0) {
+      bulkDeleteBtn.style.display = 'inline-flex';
+      if (bulkDeleteBtnText) {
+        bulkDeleteBtnText.textContent = `Padam (${count}) Rekod Terpilih`;
+      }
+    } else {
+      bulkDeleteBtn.style.display = 'none';
     }
   }
 
@@ -634,6 +697,31 @@ function updateSelectedCountUI(filteredList) {
     }
   }
 }
+
+// Bulk Delete Handler bagi rekod yang dipilih
+bulkDeleteBtn?.addEventListener('click', async () => {
+  const count = selectedIds.size;
+  if (count === 0) {
+    alert('Sila tandakan sekurang-kurangnya satu rekod kiriman doa untuk dipadam.');
+    return;
+  }
+
+  const confirmed = confirm(`Adakah anda pasti ingin memadam ${count} rekod kiriman doa terpilih ini secara kekal dari pangkalan data cloud? Tindakan ini tidak boleh dikembalikan.`);
+  if (!confirmed) return;
+
+  const idsToDelete = Array.from(selectedIds);
+
+  // 1. Padam secara serta-merta dari storan tempatan
+  allRecords = deleteRecordsFromStorage(idsToDelete);
+  selectedIds.clear();
+  renderDashboard();
+
+  // 2. Padam secara kekal dari Firestore Cloud
+  showToastNotification(`Sedang memadam ${count} rekod doa dari pangkalan data...`);
+  await deleteRecordsFromFirestore(idsToDelete);
+  showToastNotification(`✓ ${count} rekod doa terpilih telah berjaya dipadam secara kekal.`);
+  renderDashboard();
+});
 
 // Select all toggle
 selectAllCheckbox?.addEventListener('change', (e) => {

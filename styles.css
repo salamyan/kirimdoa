@@ -70,6 +70,8 @@ legend { padding: 0; }
 .btn--ghost:hover { border-color: var(--ink); color: var(--ink); }
 .btn--soft { background: var(--soft); color: var(--ink); }
 .btn--soft:hover { background: #E5E0D7; }
+.btn--danger { background: #FEF3F2; color: #B42318; border: 1px solid #FECDCA; }
+.btn--danger:hover { background: #D92D20; color: #FFFFFF; border-color: #D92D20; }
 .btn--dashed { align-self: flex-start; background: transparent; border: 1px dashed #B9B3A7; color: var(--ink); font-size: 14px; border-radius: var(--r-sm); padding: 0 14px; }
 .btn--dashed:hover { border-color: var(--ink); }
 .btn[disabled] { opacity: .6; cursor: progress; }
@@ -1664,6 +1666,27 @@ input.invalid, textarea.invalid { border-color: #B42318; background: #FFFBFB; }
   line-height: 1.45;
   font-size: 13px;
   color: var(--ink);
+}
+
+.row-delete-btn {
+  background: #FFF1F0;
+  border: 1px solid #FFA39E;
+  color: #CF1322;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.row-delete-btn:hover {
+  background: #FF4D4F;
+  border-color: #FF4D4F;
+  color: #FFFFFF;
+  transform: scale(1.08);
 }
 
 /* ---------- Tablet ---------- */
