@@ -204,12 +204,21 @@ const newEmailInput = document.getElementById('newAdminEmailInput');
 const addEmailBtn = document.getElementById('addAdminEmailBtn');
 const allowedEmailsList = document.getElementById('allowedEmailsList');
 
+const SUPER_ADMIN_EMAIL = 'salam@yayasanannabawi.com';
+
 // 1. Auth Handling (Google / Email Login Only)
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const email = (user.email || '').toLowerCase().trim();
+    const rawEmail = (user.email || user.providerData?.[0]?.email || '').toLowerCase().trim();
+    const email = rawEmail;
+    const isSuperAdmin = (email === SUPER_ADMIN_EMAIL);
+
     let allowed = getAllowedAdminEmails().map((e) => e.toLowerCase().trim());
-    let isAllowed = allowed.includes(email);
+    if (!allowed.includes(SUPER_ADMIN_EMAIL)) {
+      allowed.unshift(SUPER_ADMIN_EMAIL);
+      saveAllowedAdminEmails(allowed);
+    }
+    let isAllowed = isSuperAdmin || allowed.includes(email);
 
     // Ambil senarai terkini dari Firestore settings/allowedEmails
     try {
@@ -221,12 +230,12 @@ onAuthStateChanged(auth, async (user) => {
             .map((e) => (e || '').toLowerCase().trim())
             .filter((e) => e && e !== 'admin@yayasanannabawi.com');
 
-          if (firestoreEmails.length === 0) {
-            firestoreEmails = ['salam@yayasanannabawi.com'];
+          if (!firestoreEmails.includes(SUPER_ADMIN_EMAIL)) {
+            firestoreEmails.unshift(SUPER_ADMIN_EMAIL);
           }
 
-          // Jika dalam Firestore masih ada admin@yayasanannabawi.com, padamkan serta-merta
-          if (data.emails.some((e) => (e || '').toLowerCase().trim() === 'admin@yayasanannabawi.com')) {
+          // Jika dalam Firestore tiada salam@yayasanannabawi.com atau masih ada admin@..., kemas kini terus
+          if (!data.emails.includes(SUPER_ADMIN_EMAIL) || data.emails.includes('admin@yayasanannabawi.com')) {
             setDoc(doc(db, 'settings', 'allowedEmails'), {
               emails: firestoreEmails,
               updatedAt: serverTimestamp()
@@ -235,13 +244,16 @@ onAuthStateChanged(auth, async (user) => {
 
           saveAllowedAdminEmails(firestoreEmails);
           allowed = firestoreEmails;
-          isAllowed = allowed.includes(email);
+          isAllowed = isSuperAdmin || allowed.includes(email);
         }
       } else {
         await setDoc(doc(db, 'settings', 'allowedEmails'), {
-          emails: ['salam@yayasanannabawi.com'],
+          emails: [SUPER_ADMIN_EMAIL],
           updatedAt: serverTimestamp()
         });
+        saveAllowedAdminEmails([SUPER_ADMIN_EMAIL]);
+        allowed = [SUPER_ADMIN_EMAIL];
+        isAllowed = isSuperAdmin || allowed.includes(email);
       }
     } catch (err) {
       console.warn('Gagal membaca Firestore settings/allowedEmails:', err);
